@@ -1,0 +1,38 @@
+[en] -- OciXCrom
+CRXRANKS_RANKINFO_NORMAL = You have %i/%i XP. Your rank is #%i: %s. Next rank: %s.
+CRXRANKS_RANKINFO_FINAL = You have %i XP. Your rank is #%i: %s. You are on the final level!
+CRXRANKS_GIVE_XP = %s gave %i XP to %s
+CRXRANKS_TAKE_XP = %s took %i XP from %s
+CRXRANKS_RESET_XP = %s reset %s's XP
+CRXRANKS_LEVEL_REACHED = %s has reached Level %i [%s]
+CRXRANKS_LEVEL_LOST = %s got back on Level %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rXP List
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[mk] -- OciXCrom
+CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvojot rank e #%i: %s. Sleden rank: %s.
+CRXRANKS_RANKINFO_FINAL = Imash %i XP. Tvojot rank e #%i: %s. Ti si na poslednoto nivo!
+CRXRANKS_GIVE_XP = %s dade %i XP na %s
+CRXRANKS_GIVE_XP = %s zema %i XP od %s
+CRXRANKS_RESET_XP = %s resetira XP-to na %s
+CRXRANKS_LEVEL_REACHED = %s go dostigna Nivoto %i [%s]
+CRXRANKS_LEVEL_LOST = %s se vrati na Nivo %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rSpisok so XP
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[bg] -- OciXCrom
+CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvoqt rank e #%i: %s. Sledvasht rank: %s.
+CRXRANKS_RANKINFO_FINAL = Imash %i XP. Tvoqt rank e #%i: %s. Ti si na poslednoto nivo!
+CRXRANKS_GIVE_XP = %s dade %i XP na %s
+CRXRANKS_GIVE_XP = %s vze %i XP ot %s
+CRXRANKS_RESET_XP = %s resetira XP-to na %s
+CRXRANKS_LEVEL_REACHED = %s dostigna Nivoto %i [%s]
+CRXRANKS_LEVEL_LOST = %s se vurna na Nivo %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rSpisuk s XP
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
