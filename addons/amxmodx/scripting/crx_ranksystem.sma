@@ -20,7 +20,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.0"
+#define PLUGIN_VERSION "2.1"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -196,6 +196,7 @@ public plugin_end()
 	TrieDestroy(g_tXPRewards)
 	TrieDestroy(g_tXPRewardsVIP)
 	DestroyForward(g_fwdUserLevelUpdated)
+	nvault_close(g_iVault)
 }
 
 ReadFile()
@@ -283,7 +284,7 @@ ReadFile()
 								#endif
 							}
 							else if(equal(szKey, "SAVE_TYPE"))
-								g_eSettings[SAVE_TYPE] = clamp(str_to_num(szValue), 0, 2)
+								g_eSettings[SAVE_TYPE] = clamp(str_to_num(szValue), SAVE_NICKNAME, SAVE_STEAMID)
 							else if(equal(szKey, "XP_COMMANDS"))
 							{
 								while(szValue[0] != 0 && strtok(szValue, szKey, charsmax(szKey), szValue, charsmax(szValue), ','))
@@ -486,6 +487,7 @@ public client_infochanged(id)
 		{
 			use_vault(id, szOldName, VAULT_WRITE)
 			use_vault(id, szNewName, VAULT_READ)
+			update_hudinfo(id)
 		}
 		
 		set_task(DELAY_ON_CHANGE, "update_vip_status", id)
@@ -544,7 +546,7 @@ public Cmd_XPList(id, iLevel, iCid)
 	formatex(szTitle, charsmax(szTitle), "%L", id, "CRXRANKS_MENU_TITLE")
 	
 	new iPlayers[32], iPnum, iMenu = menu_create(szTitle, "XPList_Handler")
-	get_players(iPlayers, iPnum)
+	get_players(iPlayers, iPnum); SortCustom1D(iPlayers, iPnum, "sort_players_by_xp")
 	
 	for(new szItem[128], szName[32], iPlayer, i; i < iPnum; i++)
 	{
@@ -652,6 +654,16 @@ public OnPlayerKilled()
 	
 	@GIVE_REWARD:
 	give_user_xp(iAttacker, iReward)
+}
+
+public sort_players_by_xp(id1, id2)
+{
+	if(g_ePlayerData[id1][XP] > g_ePlayerData[id2][XP])
+		return -1
+	else if(g_ePlayerData[id1][XP] < g_ePlayerData[id2][XP])
+		return 1
+	
+	return 0
 }
 
 use_vault(const id, const szInfo[], const iType)
