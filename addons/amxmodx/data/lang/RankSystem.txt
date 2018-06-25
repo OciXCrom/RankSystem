@@ -36,3 +36,55 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rSpisuk s XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[bp] -- tarsisd2
+CRXRANKS_RANKINFO_NORMAL = Voce tem &x04%i/%i XP&x01. Seu rank &x04#%i&x01: &x03%s&x01. Proximo rank: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Voce tem &x04%i XP&x01. Seu rank &x04#%i&x01: &x03%s&x01. Voce esta no ultimo level!
+CRXRANKS_GIVE_XP = &x03%s &x01perdeu &x04%i XP &x01para &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01tomou &x04%i XP &x01de &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01resetou &x03%s&x01's XP
+CRXRANKS_LEVEL_REACHED = &x03%s &x01subiu para o&x04Level %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01voltou para o &x04Level %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \ySistema de Rank: \rLista de XP
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[ro] -- DevilBoy.eXe
+CRXRANKS_RANKINFO_NORMAL = Ai &x04%i/%i XP&x01. Rangul tau este &x04#%i&x01: &x03%s&x01. Urmatorul rang: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Ai &x04%i XP&x01. Rangul tau este &x04#%i&x01: &x03%s&x01. Ai ajung la ultimul nivel!
+CRXRANKS_GIVE_XP = &x03%s &x01a dat &x04%i XP &x01lui &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01a luat &x04%i XP &x01de la &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01ia resetat XP-u lui &x03%s&x01
+CRXRANKS_LEVEL_REACHED = &x03%s &x01a ajuns la &x04Nivelul %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01a ajuns inapoi la &x04Nivelul %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang System: \rLista XP
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[es] -- Rivotril
+CRXRANKS_RANKINFO_NORMAL = Tienes &x04%i/%i EXP&x01. Tu rango es &x04#%i&x01: &x03%s&x01. Sig. Rango: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Tienes &x04%i XP&x01. Tu rango es &x04#%i&x01: &x03%s&x01. Ahora estas en el ultimo nivel!
+CRXRANKS_GIVE_XP = &x03%s &x01le dio &x04%i EXP &x01a &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01le quito &x04%i EXP &x01a &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01le reseteo &x03%s&x01's EXP
+CRXRANKS_LEVEL_REACHED = &x03%s &x01llego a &x04Nivel %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01volvio a &x04Nivel %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \ySistema de Rangos: \rLista de EXP
+CRXRANKS_ITEM_FORMAT = \d[%i EXP] \w%s \r[\yNivel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i EXP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i EXP
+
+[sk] -- Belo95135
+CRXRANKS_RANKINFO_NORMAL = Mas &x04%i/%i XP&x01. Tvoja priecka je &x04#%i&x01: &x03%s&x01. Najblizsi rank: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Mas &x04%i XP&x01. Tvoj priecka je &x04#%i&x01: &x03%s&x01. Nachadzas sa v najvyssej urovni!
+CRXRANKS_GIVE_XP = &x03%s &x01udelil &x04%i XP &x01hracovi &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01vzal &x04%i XP &x01hracovi &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01vynuloval hracovi &x03%s&x01 XP
+CRXRANKS_LEVEL_REACHED = &x03%s &x01dosiahol &x04uroven %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01sa vratil na &x04uroven %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCromov \yRank System: \rXP List
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yUroven %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
