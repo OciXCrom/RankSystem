@@ -20,7 +20,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.1"
+#define PLUGIN_VERSION "2.1.1"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -174,6 +174,9 @@ public plugin_init()
 	register_clcmd("say_team /xplist", "Cmd_XPList", ADMIN_BAN)
 	register_concmd("crxranks_give_xp", "Cmd_GiveXP", ADMIN_RCON, "<nick|#userid> <amount>")
 	register_concmd("crxranks_reset_xp", "Cmd_ResetXP", ADMIN_RCON, "<nick|#userid>")
+	
+	if(g_eSettings[LEVELUP_SCREEN_FADE_ENABLED] || g_eSettings[LEVELDN_SCREEN_FADE_ENABLED])
+		g_iScreenFade = get_user_msgid("ScreenFade")
 
 	g_fwdUserLevelUpdated = CreateMultiForward("crxranks_user_level_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
 }
@@ -303,12 +306,7 @@ ReadFile()
 									precache_sound(szValue)
 							}
 							else if(equal(szKey, "LEVELUP_SCREEN_FADE_ENABLED"))
-							{
 								g_eSettings[LEVELUP_SCREEN_FADE_ENABLED] = _:clamp(str_to_num(szValue), false, true)
-								
-								if(g_eSettings[LEVELUP_SCREEN_FADE_ENABLED] && !g_iScreenFade)
-									g_iScreenFade = get_user_msgid("ScreenFade")
-							}
 							else if(equal(szKey, "LEVELUP_SCREEN_FADE_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]), szTemp[3], charsmax(szTemp[]))
@@ -324,12 +322,7 @@ ReadFile()
 									precache_sound(szValue)
 							}
 							else if(equal(szKey, "LEVELDN_SCREEN_FADE_ENABLED"))
-							{
 								g_eSettings[LEVELDN_SCREEN_FADE_ENABLED] = _:clamp(str_to_num(szValue), false, true)
-								
-								if(g_eSettings[LEVELDN_SCREEN_FADE_ENABLED] && !g_iScreenFade)
-									g_iScreenFade = get_user_msgid("ScreenFade")
-							}
 							else if(equal(szKey, "LEVELDN_SCREEN_FADE_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]), szTemp[3], charsmax(szTemp[]))
