@@ -114,3 +114,16 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rXP Liste
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[nl] -- NapoleoN#
+CRXRANKS_RANKINFO_NORMAL = Je hebt %i/%i XP. Uw rang is #%i: %s. Volgend rang: %s.
+CRXRANKS_RANKINFO_FINAL = Je hebt %i XP. Uw rang is #%i: %s. Je bent aan het laatste level!
+CRXRANKS_GIVE_XP = %s  gaf %i XP aan %s
+CRXRANKS_TAKE_XP = %s nam %i XP van %s
+CRXRANKS_RESET_XP = %s resette %s's XP
+CRXRANKS_LEVEL_REACHED = %s heeft Level %i bereikt [%s]
+CRXRANKS_LEVEL_LOST = %s is weer op Level %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang Systeem: \rXP Lijst
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
