@@ -20,7 +20,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.1.1"
+#define PLUGIN_VERSION "2.1.2"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -674,8 +674,14 @@ use_vault(const id, const szInfo[], const iType)
 		}
 		case VAULT_READ:
 		{
-			g_ePlayerData[id][XP] = clamp(nvault_get(g_iVault, szInfo), 0)
-			check_level(id, false)
+			static iData
+			iData = nvault_get(g_iVault, szInfo)
+			
+			if(iData)
+			{
+				g_ePlayerData[id][XP] = clamp(iData, 0)
+				check_level(id, false)
+			}
 		}
 	}
 }
