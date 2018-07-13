@@ -678,10 +678,9 @@ use_vault(const id, const szInfo[], const iType)
 			iData = nvault_get(g_iVault, szInfo)
 			
 			if(iData)
-			{
 				g_ePlayerData[id][XP] = clamp(iData, 0)
-				check_level(id, false)
-			}
+				
+			check_level(id, false)
 		}
 	}
 }
