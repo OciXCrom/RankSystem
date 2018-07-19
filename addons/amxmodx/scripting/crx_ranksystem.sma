@@ -1,5 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
+#include <fakemeta>
 #include <nvault>
 
 // Comment or remove this line in order to run the plugin on a mod different than Counter-Strike.
@@ -16,11 +17,13 @@ new CC_PREFIX[64]
 	#include <dhudmessage>
 #endif
 
+#include <crxranks_const>
+
 #if defined client_disconnected
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.1.2"
+#define PLUGIN_VERSION "2.2"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -30,20 +33,21 @@ new CC_PREFIX[64]
 #define MAX_RANK_LENGTH 32
 #define MAX_XP_REWARD_LENGTH 32
 #define MAX_XP_LENGTH 16
+#define TASK_HUD 304500
 
 #if !defined MAX_NAME_LENGTH
 	#define MAX_NAME_LENGTH 32
 #endif
 
-#define ARG_CURRENT_XP 			"$current_xp$"
+#define ARG_CURRENT_XP 		"$current_xp$"
 #define ARG_NEXT_XP 			"$next_xp$"
 #define ARG_XP_NEEDED 			"$xp_needed$"
 #define ARG_LEVEL 				"$level$"
-#define ARG_NEXT_LEVEL 			"$next_level$"
+#define ARG_NEXT_LEVEL 		"$next_level$"
 #define ARG_RANK 				"$rank$"
 #define ARG_NEXT_RANK 			"$next_rank$"
 #define ARG_MAX_LEVELS			"$max_levels$"
-#define ARG_LINE_BREAK 			"$br$"
+#define ARG_LINE_BREAK 		"$br$"
 
 #define XPREWARD_KILL			"kill"
 #define XPREWARD_HEADSHOT 		"headshot"
@@ -53,7 +57,7 @@ new CC_PREFIX[64]
 #if defined USE_CSTRIKE
 #define XPREWARD_BOMB_PLANTED 	"bomb_planted"
 #define XPREWARD_BOMB_DEFUSED 	"bomb_defused"
-#define XPREWARD_BOMB_EXPLODED 	"bomb_exploded"
+#define XPREWARD_BOMB_EXPLODED "bomb_exploded"
 #endif
 
 #define clr(%1) %1 == -1 ? random(256) : %1
@@ -66,12 +70,6 @@ g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .hol
 
 #define XP_NOTIFIER_PARAMS_LOSE clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][0]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][1]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][2]),\
 g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .holdtime = g_eSettings[XP_NOTIFIER_DURATION]
-
-enum (+= 32)
-{
-	TASK_HUD = 20000,
-	TASK_READ
-}
 
 enum
 {
@@ -127,8 +125,10 @@ enum _:Settings
 	VIP_FLAGS[32],
 	VIP_FLAGS_BIT,
 	VAULT_NAME[32],
+	bool:USE_COMBINED_EVENTS,
 	bool:HUDINFO_ENABLED,
 	bool:HUDINFO_ALIVE_ONLY,
+	bool:HUDINFO_OTHER_PLAYERS,
 	HUDINFO_COLOR[3],
 	Float:HUDINFO_POSITION[2],
 	bool:HUDINFO_USE_DHUD,
@@ -157,6 +157,7 @@ new g_iObject[2]
 new g_iScreenFade
 new g_iFlagZ
 new g_fwdUserLevelUpdated
+new g_fwdUserReceiveXP
 
 public plugin_init()
 {
@@ -179,6 +180,7 @@ public plugin_init()
 		g_iScreenFade = get_user_msgid("ScreenFade")
 
 	g_fwdUserLevelUpdated = CreateMultiForward("crxranks_user_level_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
+	g_fwdUserReceiveXP = CreateMultiForward("crxranks_user_receive_xp", ET_STOP, FP_CELL, FP_CELL, FP_CELL)
 }
 
 public plugin_precache()
@@ -346,10 +348,14 @@ ReadFile()
 								g_iVault = nvault_open(szValue)
 								copy(g_eSettings[VAULT_NAME], charsmax(g_eSettings[VAULT_NAME]), szValue)
 							}
+							else if(equal(szKey, "USE_COMBINED_EVENTS"))
+								g_eSettings[USE_COMBINED_EVENTS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ENABLED"))
 								g_eSettings[HUDINFO_ENABLED] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ALIVE_ONLY"))
 								g_eSettings[HUDINFO_ALIVE_ONLY] = _:clamp(str_to_num(szValue), false, true)
+							else if(equal(szKey, "HUDINFO_OTHER_PLAYERS"))
+								g_eSettings[HUDINFO_OTHER_PLAYERS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]))
@@ -437,18 +443,12 @@ ReadFile()
 	}
 }
 
-public client_authorized(id)
+public client_connect(id)
 {
 	reset_stats(id)
-	set_task(DELAY_ON_CONNECT, "ReadData", id + TASK_READ)
-}
-	
-public ReadData(id)
-{
-	id -= TASK_READ
 	
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
-	get_user_saveinfo(id, szInfo, charsmax(szInfo))	
+	get_user_saveinfo(id, szInfo, charsmax(szInfo))
 	use_vault(id, szInfo, VAULT_READ)
 	update_vip_status(id)
 	
@@ -457,6 +457,9 @@ public ReadData(id)
 }
 
 public client_disconnect(id)
+	OnClientDisconnect(id)
+	
+OnClientDisconnect(const id)
 {
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
@@ -491,30 +494,42 @@ public DisplayHUD(id)
 {
 	id -= TASK_HUD
 	
-	if(!is_user_alive(id) && g_eSettings[HUDINFO_ALIVE_ONLY])
+	static iTarget
+	iTarget = id
+	
+	if(!is_user_alive(id))
+	{		
+		if(g_eSettings[HUDINFO_ALIVE_ONLY])
+			return
+			
+		if(g_eSettings[HUDINFO_OTHER_PLAYERS])
+			iTarget = pev(id, pev_iuser2)
+	}
+	
+	if(!iTarget)
 		return
 	
 	if(g_eSettings[HUDINFO_USE_DHUD])
 	{
 		set_dhudmessage(HUDINFO_PARAMS)
-		show_dhudmessage(id, g_ePlayerData[id][HUDInfo])
+		show_dhudmessage(id, g_ePlayerData[iTarget][HUDInfo])
 	}
 	else
 	{
 		set_hudmessage(HUDINFO_PARAMS)
-		ShowSyncHudMsg(id, g_iObject[OBJ_HUDINFO], g_ePlayerData[id][HUDInfo])
+		ShowSyncHudMsg(id, g_iObject[OBJ_HUDINFO], g_ePlayerData[iTarget][HUDInfo])
 	}
 }
 
 #if defined USE_CSTRIKE
 public bomb_planted(id)
-	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_PLANTED))
+	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_PLANTED), CRXRANKS_XPS_REWARD)
 	
 public bomb_defused(id)
-	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_DEFUSED))
+	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_DEFUSED), CRXRANKS_XPS_REWARD)
 	
 public bomb_explode(id)
-	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_EXPLODED))
+	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_EXPLODED), CRXRANKS_XPS_REWARD)
 #endif
 
 public Cmd_XP(id)
@@ -578,7 +593,7 @@ public Cmd_GiveXP(id, iLevel, iCid)
 	get_user_name(iPlayer, szName[1], charsmax(szName[]))
 	
 	new szKey[32], iXP = str_to_num(szAmount)
-	give_user_xp(iPlayer, iXP)
+	give_user_xp(iPlayer, iXP, CRXRANKS_XPS_ADMIN)
 	
 	if(iXP >= 0)
 		copy(szKey, charsmax(szKey), "CRXRANKS_GIVE_XP")
@@ -621,32 +636,49 @@ public OnPlayerKilled()
 	if(!is_user_connected(iAttacker) || !is_user_connected(iVictim))
 		return
 		
-	new iReward
-		
+	new iReward, iTemp
+	
 	if(iAttacker == iVictim)
 	{
-		iReward = get_xp_reward(iAttacker, XPREWARD_SUICIDE)
-		goto @GIVE_REWARD
-	}
+		iTemp = get_xp_reward(iAttacker, XPREWARD_SUICIDE)
+		iReward += iTemp
 		
-	if(get_user_team(iAttacker) == get_user_team(iVictim))
+		if(should_skip(iTemp))
+			goto @GIVE_REWARD
+	}
+	else if(get_user_team(iAttacker) == get_user_team(iVictim))
 	{
-		iReward = get_xp_reward(iAttacker, XPREWARD_TEAMKILL)
-		goto @GIVE_REWARD
+		iTemp = get_xp_reward(iAttacker, XPREWARD_TEAMKILL)
+		iReward += iTemp
+		
+		if(should_skip(iTemp))
+			goto @GIVE_REWARD
 	}
+	else
+	{
+		new szWeapon[16]
+		read_data(4, szWeapon, charsmax(szWeapon))
 		
-	iReward = get_xp_reward(iAttacker, XPREWARD_KILL)
-	
-	if(read_data(3))
-		iReward += get_xp_reward(iAttacker, XPREWARD_HEADSHOT)
+		iTemp = get_xp_reward(iAttacker, szWeapon)
+		iReward += iTemp
 		
-	new szWeapon[16]
-	read_data(4, szWeapon, charsmax(szWeapon))
-	
-	iReward += get_xp_reward(iAttacker, szWeapon)
+		if(should_skip(iTemp))
+			goto @GIVE_REWARD
+			
+		if(read_data(3))
+		{
+			iTemp = get_xp_reward(iAttacker, XPREWARD_HEADSHOT)
+			iReward += iTemp
+			
+			if(should_skip(iTemp))
+				goto @GIVE_REWARD
+		}
+		
+		iReward += get_xp_reward(iAttacker, XPREWARD_KILL)
+	}
 	
 	@GIVE_REWARD:
-	give_user_xp(iAttacker, iReward)
+	give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
 }
 
 public sort_players_by_xp(id1, id2)
@@ -662,7 +694,7 @@ public sort_players_by_xp(id1, id2)
 use_vault(const id, const szInfo[], const iType)
 {
 	if(!szInfo[0])
-		return
+		return	
 		
 	switch(iType)
 	{
@@ -707,10 +739,24 @@ get_xp_reward(const id, const szKey[])
 	return 0
 }
 
-give_user_xp(const id, iXP)
+give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 {
 	if(!iXP)
 		return
+		
+	static iReturn
+	ExecuteForward(g_fwdUserReceiveXP, iReturn, id, iXP, iSource)
+	
+	switch(iReturn)
+	{
+		case CRXRANKS_HANDLED: return
+		case CRXRANKS_CONTINUE: { }
+		default:
+		{
+			if(iReturn != 0)
+				iXP = iReturn
+		}
+	}
 		
 	g_ePlayerData[id][XP] += iXP
 	
@@ -772,6 +818,9 @@ reset_stats(const id)
 
 bool:has_argument(const szMessage[], const szArg[])
 	return contain(szMessage, szArg) != -1
+	
+bool:should_skip(const iNum)
+	return (iNum != 0 && !g_eSettings[USE_COMBINED_EVENTS])
 	
 send_message(const id, const bool:bLog, const szInput[], any:...)
 {
@@ -958,6 +1007,7 @@ public plugin_natives()
 	register_native("crxranks_is_user_on_final", 		"_crxranks_is_user_on_final")
 	register_native("crxranks_is_user_vip",				"_crxranks_is_user_vip")
 	register_native("crxranks_is_xpn_enabled", 			"_crxranks_is_xpn_enabled")
+	register_native("crxranks_using_comb_events",		"_crxranks_using_comb_events")
 	register_native("crxranks_xpn_is_using_dhud",		"_crxranks_xpn_is_using_dhud")
 }
 
@@ -1050,13 +1100,13 @@ public _crxranks_give_user_xp(iPlugin, iParams)
 		iReward = get_xp_reward(id, szReward)
 		
 		if(iReward)
-			give_user_xp(id, iReward)
+			give_user_xp(id, iReward, CRXRanks_XPSources:get_param(3))
 			
 		return iReward
 	}
 	
 	iReward = get_param(2)
-	give_user_xp(id, iReward)
+	give_user_xp(id, iReward, CRXRanks_XPSources:get_param(3))
 	return iReward
 }
 
@@ -1080,6 +1130,9 @@ public bool:_crxranks_is_user_vip(iPlugin, iParams)
 	
 public bool:_crxranks_is_xpn_enabled(iPlugin, iParams)
 	return g_eSettings[XP_NOTIFIER_ENABLED]
+	
+public bool:_crxranks_using_comb_events(iPlugin, iParams)
+	return g_eSettings[USE_COMBINED_EVENTS]
 	
 public bool:_crxranks_xpn_is_using_dhud(iPlugin, iParams)
 	return g_eSettings[XP_NOTIFIER_USE_DHUD]
