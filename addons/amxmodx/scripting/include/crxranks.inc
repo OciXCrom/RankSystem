@@ -4,12 +4,9 @@
 
 #define _crxranks_included
 
-enum
-{
-	CRXRANKS_ST_NICKNAME = 0,
-	CRXRANKS_ST_IP,
-	CRXRANKS_ST_STEAMID
-}
+#if !defined _crxranks_const_included
+    #include <crxranks_const>
+#endif
 
 /** 
  * Called when the client's level changes.
@@ -20,6 +17,18 @@ enum
  * @noreturn
  */
 forward crxranks_user_level_updated(id, level, bool:levelup)
+
+/** 
+ * Called right before the client receives XP.
+ * 
+ * @note You can use CRXRANKS_STOP to prevent the XP from being added
+ *
+ * @param id	 		Client index.
+ * @param xp	 		Amount of XP ready to be received.
+ * @param source	 	The XP source.
+ * @noreturn
+ */
+forward crxranks_user_receive_xp(id, xp, CRXRanks_XPSources:source)
 
 /** 
  * Returns the chat prefix set in the plugin's configuration file.
@@ -74,7 +83,7 @@ native crxranks_get_rank_by_level(level, buffer[], len)
  *
  * @return				0 if it's set to nickname, 1 for IP and 2 for SteamID.
  */
-native crxranks_get_save_type()
+native CRXRanks_SaveTypes:crxranks_get_save_type()
 
 /** 
  * Returns the client's HUD information.
@@ -177,7 +186,7 @@ native crxranks_get_xp_reward(id, reward[])
  * @param reward		Reward keyword.
  * @return				Amount of XP given.
  */
-native crxranks_give_user_xp(id, amount = 0, reward[] = "")
+native crxranks_give_user_xp(id, amount = 0, reward[] = "", CRXRanks_XPSources:source = CRXRANKS_XPS_PLUGIN)
 
 /** 
  * Checks if the HUD info system is using DHUD messages.
@@ -229,6 +238,13 @@ native bool:crxranks_is_user_vip(id)
  * @return				True if it is, false otherwise.
  */
 native bool:crxranks_is_xpn_enabled()
+
+/** 
+ * Checks if the plugin's option to use combined events is enabled.
+ * 
+ * @return				True if it is, false otherwise.
+ */
+native bool:crxranks_using_combined_events()
 
 /** 
  * Checks if the XP notifier system is using DHUD messages.
