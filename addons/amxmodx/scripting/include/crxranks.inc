@@ -21,7 +21,7 @@ forward crxranks_user_level_updated(id, level, bool:levelup)
 /** 
  * Called right before the client receives XP.
  * 
- * @note You can use CRXRANKS_STOP to prevent the XP from being added
+ * @note You can use CRXRANKS_STOP to prevent the XP from being added.
  *
  * @param id	 		Client index.
  * @param xp	 		Amount of XP ready to be received.
