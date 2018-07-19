@@ -457,9 +457,6 @@ public client_connect(id)
 }
 
 public client_disconnect(id)
-	OnClientDisconnect(id)
-	
-OnClientDisconnect(const id)
 {
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
