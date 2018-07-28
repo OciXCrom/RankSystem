@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.2"
+#define PLUGIN_VERSION "2.3"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -39,15 +39,16 @@ new CC_PREFIX[64]
 	#define MAX_NAME_LENGTH 32
 #endif
 
-#define ARG_CURRENT_XP 		"$current_xp$"
+#define ARG_CURRENT_XP 			"$current_xp$"
 #define ARG_NEXT_XP 			"$next_xp$"
 #define ARG_XP_NEEDED 			"$xp_needed$"
 #define ARG_LEVEL 				"$level$"
-#define ARG_NEXT_LEVEL 		"$next_level$"
+#define ARG_NEXT_LEVEL 			"$next_level$"
 #define ARG_RANK 				"$rank$"
 #define ARG_NEXT_RANK 			"$next_rank$"
 #define ARG_MAX_LEVELS			"$max_levels$"
-#define ARG_LINE_BREAK 		"$br$"
+#define ARG_LINE_BREAK 			"$br$"
+#define ARG_NAME 				"$name$"
 
 #define XPREWARD_KILL			"kill"
 #define XPREWARD_HEADSHOT 		"headshot"
@@ -55,9 +56,9 @@ new CC_PREFIX[64]
 #define XPREWARD_SUICIDE 		"suicide"
 
 #if defined USE_CSTRIKE
-#define XPREWARD_BOMB_PLANTED 	"bomb_planted"
-#define XPREWARD_BOMB_DEFUSED 	"bomb_defused"
-#define XPREWARD_BOMB_EXPLODED "bomb_exploded"
+	#define XPREWARD_BOMB_PLANTED 	"bomb_planted"
+	#define XPREWARD_BOMB_DEFUSED 	"bomb_defused"
+	#define XPREWARD_BOMB_EXPLODED 	"bomb_exploded"
 #endif
 
 #define clr(%1) %1 == -1 ? random(256) : %1
@@ -125,9 +126,12 @@ enum _:Settings
 	VIP_FLAGS[32],
 	VIP_FLAGS_BIT,
 	VAULT_NAME[32],
+	TEAM_LOCK,
+	MINIMUM_PLAYERS,
 	bool:USE_COMBINED_EVENTS,
 	bool:HUDINFO_ENABLED,
 	bool:HUDINFO_ALIVE_ONLY,
+	bool:HUDINFO_TEAM_LOCK,
 	bool:HUDINFO_OTHER_PLAYERS,
 	HUDINFO_COLOR[3],
 	Float:HUDINFO_POSITION[2],
@@ -348,12 +352,18 @@ ReadFile()
 								g_iVault = nvault_open(szValue)
 								copy(g_eSettings[VAULT_NAME], charsmax(g_eSettings[VAULT_NAME]), szValue)
 							}
+							else if(equal(szKey, "TEAM_LOCK"))
+								g_eSettings[TEAM_LOCK] = str_to_num(szValue)
+							else if(equal(szKey, "MINIMUM_PLAYERS"))
+								g_eSettings[MINIMUM_PLAYERS] = clamp(str_to_num(szValue), 0, 32)
 							else if(equal(szKey, "USE_COMBINED_EVENTS"))
 								g_eSettings[USE_COMBINED_EVENTS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ENABLED"))
 								g_eSettings[HUDINFO_ENABLED] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ALIVE_ONLY"))
 								g_eSettings[HUDINFO_ALIVE_ONLY] = _:clamp(str_to_num(szValue), false, true)
+							else if(equal(szKey, "HUDINFO_TEAM_LOCK"))
+								g_eSettings[HUDINFO_TEAM_LOCK] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_OTHER_PLAYERS"))
 								g_eSettings[HUDINFO_OTHER_PLAYERS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_COLOR"))
@@ -500,7 +510,12 @@ public DisplayHUD(id)
 			return
 			
 		if(g_eSettings[HUDINFO_OTHER_PLAYERS])
+		{
 			iTarget = pev(id, pev_iuser2)
+
+			if(g_eSettings[TEAM_LOCK] && g_eSettings[HUDINFO_TEAM_LOCK] && get_user_team(iTarget) != g_eSettings[TEAM_LOCK])
+				return
+		}
 	}
 	
 	if(!iTarget)
@@ -740,6 +755,15 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 {
 	if(!iXP)
 		return
+
+	if(iSource == CRXRANKS_XPS_REWARD)
+	{
+		if(g_eSettings[MINIMUM_PLAYERS] && get_playersnum() < g_eSettings[MINIMUM_PLAYERS])
+			return;
+
+		if(g_eSettings[TEAM_LOCK] && get_user_team(id) != g_eSettings[TEAM_LOCK])
+			return
+	}
 		
 	static iReturn
 	ExecuteForward(g_fwdUserReceiveXP, iReturn, id, iXP, iSource)
@@ -876,6 +900,12 @@ update_hudinfo(const id)
 	
 	if(has_argument(szMessage, ARG_MAX_LEVELS))
 		replace_all(szMessage, charsmax(szMessage), ARG_MAX_LEVELS, g_szMaxLevels)
+
+	if(has_argument(szMessage, ARG_NAME))
+	{
+		get_user_name(id, szPlaceHolder, charsmax(szPlaceHolder))
+		replace_all(szMessage, charsmax(szMessage), ARG_NAME, szPlaceHolder)
+	}
 	
 	replace_all(szMessage, charsmax(szMessage), ARG_RANK, g_ePlayerData[id][Rank])
 	replace_all(szMessage, charsmax(szMessage), ARG_NEXT_RANK, g_ePlayerData[id][NextRank])
