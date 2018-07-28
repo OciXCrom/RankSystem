@@ -510,15 +510,13 @@ public DisplayHUD(id)
 			return
 			
 		if(g_eSettings[HUDINFO_OTHER_PLAYERS])
-		{
 			iTarget = pev(id, pev_iuser2)
-
-			if(g_eSettings[TEAM_LOCK] && g_eSettings[HUDINFO_TEAM_LOCK] && get_user_team(iTarget) != g_eSettings[TEAM_LOCK])
-				return
-		}
 	}
 	
 	if(!iTarget)
+		return
+
+	if(g_eSettings[TEAM_LOCK] && g_eSettings[HUDINFO_TEAM_LOCK] && get_user_team(iTarget) != g_eSettings[TEAM_LOCK])
 		return
 	
 	if(g_eSettings[HUDINFO_USE_DHUD])
