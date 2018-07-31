@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.3"
+#define PLUGIN_VERSION "2.3.1"
 #define DELAY_ON_CONNECT 2.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -460,7 +460,7 @@ public client_connect(id)
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
 	use_vault(id, szInfo, VAULT_READ)
-	update_vip_status(id)
+	set_task(DELAY_ON_CONNECT, "update_vip_status", id)
 	
 	if(g_eSettings[HUDINFO_ENABLED])
 		set_task(HUD_REFRESH_FREQ, "DisplayHUD", id + TASK_HUD, .flags = "b")
@@ -1001,7 +1001,7 @@ bool:check_level(const id, const bool:bNotify)
 
 public update_vip_status(id)
 {
-	if(g_eSettings[VIP_FLAGS_BIT] != ADMIN_ALL)
+	if(is_user_connected(id) && g_eSettings[VIP_FLAGS_BIT] != ADMIN_ALL)
 		g_ePlayerData[id][IsVIP] = bool:((get_user_flags(id) & g_eSettings[VIP_FLAGS_BIT]) == g_eSettings[VIP_FLAGS_BIT])
 }
 
