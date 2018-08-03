@@ -23,8 +23,8 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.3.1"
-#define DELAY_ON_CONNECT 2.0
+#define PLUGIN_VERSION "2.3.2"
+#define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
 #define MAX_HUDINFO_LENGTH 192
@@ -704,7 +704,7 @@ public sort_players_by_xp(id1, id2)
 use_vault(const id, const szInfo[], const iType)
 {
 	if(!szInfo[0])
-		return	
+		return
 		
 	switch(iType)
 	{
@@ -718,10 +718,7 @@ use_vault(const id, const szInfo[], const iType)
 		{
 			static iData
 			iData = nvault_get(g_iVault, szInfo)
-			
-			if(iData)
-				g_ePlayerData[id][XP] = clamp(iData, 0)
-				
+			g_ePlayerData[id][XP] = iData ? clamp(iData, 0) : 0
 			check_level(id, false)
 		}
 	}
