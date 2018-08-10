@@ -89,12 +89,12 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yUroven %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 
-[tr] -- Czarintax
+[tr] -- Czarintax, Snake.
 CRXRANKS_RANKINFO_NORMAL = Tecruben %i/%i XP. Siralaman #%i: %s. Sonraki rutbe: %s.
 CRXRANKS_RANKINFO_FINAL = Tecruben %i XP. Siralaman #%i: %s. Son seviyedesin!
-CRXRANKS_GIVE_XP = %s, %s oyuncusuna %i XP verdi.
-CRXRANKS_TAKE_XP = %s, %s oyuncusundan %i XP aldi.
-CRXRANKS_RESET_XP = %s, %s oyuncusunun tecrubesini sifirladi.
+CRXRANKS_GIVE_XP = %s %i XP'yi %s oyuncusuna verdi.
+CRXRANKS_TAKE_XP = %s %i XP'yi %s oyuncusundan aldi.
+CRXRANKS_RESET_XP = %s %s oyuncusunun tecrubesini sifirladi.
 CRXRANKS_LEVEL_REACHED = %s %i. seviyeye ulasti. [%s]
 CRXRANKS_LEVEL_LOST = %s %i. seviyeye dustu. [%s]
 CRXRANKS_MENU_TITLE = \rOciXCrom'un \yRutbe Sistemi: \rXP Listesi
