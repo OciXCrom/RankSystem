@@ -925,8 +925,6 @@ bool:check_level(const id, const bool:bNotify)
 		static bool:bLevelUp, iReturn
 		bLevelUp = iLevel > g_ePlayerData[id][Level]
 		g_ePlayerData[id][Level] = iLevel
-		
-		ExecuteForward(g_fwdUserLevelUpdated, iReturn, id, iLevel, bLevelUp)
 		ArrayGetString(g_aRankNames, iLevel, g_ePlayerData[id][Rank], charsmax(g_ePlayerData[][Rank]))
 		
 		if(iLevel < g_iMaxLevels)
@@ -947,6 +945,8 @@ bool:check_level(const id, const bool:bNotify)
 				remove_user_flags(id, g_iFlagZ)
 			}
 		}
+		
+		ExecuteForward(g_fwdUserLevelUpdated, iReturn, id, iLevel, bLevelUp)
 			
 		if(bNotify && g_eSettings[LEVELUP_MESSAGE_TYPE])
 		{
