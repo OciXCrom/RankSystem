@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.3.2"
+#define PLUGIN_VERSION "2.3.3"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
