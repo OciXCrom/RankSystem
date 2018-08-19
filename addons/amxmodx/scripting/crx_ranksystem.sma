@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.3.3"
+#define PLUGIN_VERSION "2.4"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -108,7 +108,8 @@ enum _:PlayerData
 	NextRank[MAX_RANK_LENGTH],
 	HUDInfo[MAX_HUDINFO_LENGTH],
 	bool:IsOnFinalLevel,
-	bool:IsVIP
+	bool:IsVIP,
+	bool:IsBot
 }
 
 enum _:Settings
@@ -128,6 +129,7 @@ enum _:Settings
 	VAULT_NAME[32],
 	TEAM_LOCK,
 	MINIMUM_PLAYERS,
+	bool:IGNORE_BOTS,
 	bool:USE_COMBINED_EVENTS,
 	bool:HUDINFO_ENABLED,
 	bool:HUDINFO_ALIVE_ONLY,
@@ -356,6 +358,8 @@ ReadFile()
 								g_eSettings[TEAM_LOCK] = str_to_num(szValue)
 							else if(equal(szKey, "MINIMUM_PLAYERS"))
 								g_eSettings[MINIMUM_PLAYERS] = clamp(str_to_num(szValue), 0, 32)
+							else if(equal(szKey, "IGNORE_BOTS"))
+								g_eSettings[IGNORE_BOTS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "USE_COMBINED_EVENTS"))
 								g_eSettings[USE_COMBINED_EVENTS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ENABLED"))
@@ -460,6 +464,7 @@ public client_connect(id)
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
 	use_vault(id, szInfo, VAULT_READ)
+	g_ePlayerData[id][IsBot] = !!is_user_bot(id)
 	set_task(DELAY_ON_CONNECT, "update_vip_status", id)
 	
 	if(g_eSettings[HUDINFO_ENABLED])
@@ -751,6 +756,9 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 	if(!iXP)
 		return
 
+	if(g_eSettings[IGNORE_BOTS] && g_ePlayerData[id][IsBot])
+		return
+
 	if(iSource == CRXRANKS_XPS_REWARD)
 	{
 		if(g_eSettings[MINIMUM_PLAYERS] && get_playersnum() < g_eSettings[MINIMUM_PLAYERS])
@@ -830,6 +838,7 @@ reset_stats(const id)
 	g_ePlayerData[id][HUDInfo][0] = EOS
 	g_ePlayerData[id][IsOnFinalLevel] = false
 	g_ePlayerData[id][IsVIP] = false
+	g_ePlayerData[id][IsBot] = false
 }
 
 bool:has_argument(const szMessage[], const szArg[])
