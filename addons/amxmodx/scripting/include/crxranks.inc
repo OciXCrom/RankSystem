@@ -21,14 +21,23 @@ forward crxranks_user_level_updated(id, level, bool:levelup)
 /** 
  * Called right before the client receives XP.
  * 
- * @note You can use CRXRANKS_STOP to prevent the XP from being added.
- *
  * @param id	 		Client index.
  * @param xp	 		Amount of XP ready to be received.
  * @param source	 	The XP source.
- * @noreturn
+ * @return              CRXRANKS_STOP to prevent the XP from being added,
+ *                      CRXRANKS_CONTINUE to let the XP pass through
  */
 forward crxranks_user_receive_xp(id, xp, CRXRanks_XPSources:source)
+
+/** 
+ * Called right after the client's XP amount changes.
+ * 
+ * @param id	 		Client index.
+ * @param xp	 		Amount of XP the client has after the change.
+ * @param source	 	The XP source that caused the change.
+ * @noreturn
+ */
+forward crxranks_user_xp_updated(id, xp, CRXRanks_XPSources:source)
 
 /** 
  * Returns the chat prefix set in the plugin's configuration file.
@@ -184,6 +193,7 @@ native crxranks_get_xp_reward(id, reward[])
  * @param id		 	Client index.
  * @param amount		XP amount.
  * @param reward		Reward keyword.
+ * @param source		XP source.
  * @return				Amount of XP given.
  */
 native crxranks_give_user_xp(id, amount = 0, reward[] = "", CRXRanks_XPSources:source = CRXRANKS_XPS_PLUGIN)
@@ -238,6 +248,16 @@ native bool:crxranks_is_user_vip(id)
  * @return				True if it is, false otherwise.
  */
 native bool:crxranks_is_xpn_enabled()
+
+/** 
+ * Sets the exact amount of XP that th client has.
+ *
+ * @param id		 	Client index.
+ * @param amount		XP amount.
+ * @param source		XP source.
+ * @return				Amount of XP given.
+ */
+native crxranks_set_user_xp(id, amount, CRXRanks_XPSources:source = CRXRANKS_XPS_PLUGIN)
 
 /** 
  * Checks if the plugin's option to use combined events is enabled.
