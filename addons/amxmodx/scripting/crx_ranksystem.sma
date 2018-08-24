@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.4"
+#define PLUGIN_VERSION "2.5"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -164,6 +164,7 @@ new g_iScreenFade
 new g_iFlagZ
 new g_fwdUserLevelUpdated
 new g_fwdUserReceiveXP
+new g_fwdUserXPUpdated
 
 public plugin_init()
 {
@@ -187,6 +188,7 @@ public plugin_init()
 
 	g_fwdUserLevelUpdated = CreateMultiForward("crxranks_user_level_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
 	g_fwdUserReceiveXP = CreateMultiForward("crxranks_user_receive_xp", ET_STOP, FP_CELL, FP_CELL, FP_CELL)
+	g_fwdUserXPUpdated = CreateMultiForward("crxranks_user_xp_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
 }
 
 public plugin_precache()
@@ -787,8 +789,8 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 	if(g_ePlayerData[id][XP] < 0)
 		g_ePlayerData[id][XP] = 0
 	
-	if(!check_level(id, true))
-		update_hudinfo(id)
+	check_level(id, true)
+	ExecuteForward(g_fwdUserXPUpdated, iReturn, id, g_ePlayerData[id][XP], iSource)
 		
 	if(g_eSettings[XP_NOTIFIER_ENABLED])
 	{
@@ -918,7 +920,7 @@ update_hudinfo(const id)
 	copy(g_ePlayerData[id][HUDInfo], charsmax(g_ePlayerData[][HUDInfo]), szMessage)
 }
 
-bool:check_level(const id, const bool:bNotify)
+check_level(const id, const bool:bNotify)
 {
 	static iLevel, i
 	iLevel = 0
@@ -997,12 +999,9 @@ bool:check_level(const id, const bool:bNotify)
 				message_end()
 			}
 		}
-		
-		update_hudinfo(id)
-		return true
 	}
 	
-	return false
+	update_hudinfo(id)
 }
 
 public update_vip_status(id)
@@ -1038,6 +1037,7 @@ public plugin_natives()
 	register_native("crxranks_is_user_on_final", 		"_crxranks_is_user_on_final")
 	register_native("crxranks_is_user_vip",				"_crxranks_is_user_vip")
 	register_native("crxranks_is_xpn_enabled", 			"_crxranks_is_xpn_enabled")
+	register_native("crxranks_set_user_xp", 			"_crxranks_set_user_xp")
 	register_native("crxranks_using_comb_events",		"_crxranks_using_comb_events")
 	register_native("crxranks_xpn_is_using_dhud",		"_crxranks_xpn_is_using_dhud")
 }
@@ -1161,6 +1161,17 @@ public bool:_crxranks_is_user_vip(iPlugin, iParams)
 	
 public bool:_crxranks_is_xpn_enabled(iPlugin, iParams)
 	return g_eSettings[XP_NOTIFIER_ENABLED]
+
+public bool:_crxranks_set_user_xp(iPlugin, iParams)
+{
+	static id, iReturn, CRXRanks_XPSources:iSource
+	id = get_param(1)
+	iSource = CRXRanks_XPSources:get_param(3)
+	g_ePlayerData[id][XP] = clamp(get_param(2), 0)
+
+	check_level(id, true)
+	ExecuteForward(g_fwdUserXPUpdated, iReturn, id, g_ePlayerData[id][XP], iSource)
+}
 	
 public bool:_crxranks_using_comb_events(iPlugin, iParams)
 	return g_eSettings[USE_COMBINED_EVENTS]
