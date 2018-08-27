@@ -127,3 +127,16 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang Systeem: \rXP Lijst
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[ru] -- Dev-CS Team
+CRXRANKS_RANKINFO_NORMAL = У вас %i/%i опыта. Ваше звание #%i: %s. Следующее звание: %s.
+CRXRANKS_RANKINFO_FINAL = У вас %i опыта. Ваше звание #%i: %s. Вы достишли последнего звания!
+CRXRANKS_GIVE_XP = %s дал %i опыта игроку %s
+CRXRANKS_TAKE_XP = %s взял %i опыта у игрока %s
+CRXRANKS_RESET_XP = %s обнулил %s's опыт
+CRXRANKS_LEVEL_REACHED = %s достиг Уровень %i [%s]
+CRXRANKS_LEVEL_LOST = %s откатился назад на Уровень %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yСистема званий: \rСписок опыта
+CRXRANKS_ITEM_FORMAT = \d[%i опыт] \w%s \r[\yУровень %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i опыта
+CRXRANKS_XP_NOTIFIER_LOSE = -%i опыта
