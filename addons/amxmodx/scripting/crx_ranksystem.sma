@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.5"
+#define PLUGIN_VERSION "2.6"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -131,6 +131,7 @@ enum _:Settings
 	MINIMUM_PLAYERS,
 	bool:IGNORE_BOTS,
 	bool:USE_COMBINED_EVENTS,
+	bool:NOTIFY_ON_KILL,
 	bool:HUDINFO_ENABLED,
 	bool:HUDINFO_ALIVE_ONLY,
 	bool:HUDINFO_TEAM_LOCK,
@@ -364,6 +365,8 @@ ReadFile()
 								g_eSettings[IGNORE_BOTS] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "USE_COMBINED_EVENTS"))
 								g_eSettings[USE_COMBINED_EVENTS] = _:clamp(str_to_num(szValue), false, true)
+							else if(equal(szKey, "NOTIFY_ON_KILL"))
+								g_eSettings[NOTIFY_ON_KILL] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ENABLED"))
 								g_eSettings[HUDINFO_ENABLED] = _:clamp(str_to_num(szValue), false, true)
 							else if(equal(szKey, "HUDINFO_ALIVE_ONLY"))
@@ -696,6 +699,18 @@ public OnPlayerKilled()
 	
 	@GIVE_REWARD:
 	give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
+
+	if(g_eSettings[NOTIFY_ON_KILL] && iReward != 0)
+	{
+		if(iAttacker == iVictim)
+			CC_SendMessage(iAttacker, "%L", iAttacker, "CRXRANKS_NOTIFY_SUICIDE", abs(iReward))
+		else
+		{
+			new szName[MAX_NAME_LENGTH]
+			get_user_name(iVictim, szName, charsmax(szName))
+			CC_SendMessage(iAttacker, "%L", iAttacker, iReward >= 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iReward), szName)
+		}
+	}
 }
 
 public sort_players_by_xp(id1, id2)

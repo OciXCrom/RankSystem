@@ -10,6 +10,9 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rXP List
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = You received %i XP for killing %s
+CRXRANKS_NOTIFY_KILL_LOSE = You lost %i XP for killing %s
+CRXRANKS_NOTIFY_SUICIDE = You lost %i XP for committing suicide.
 
 [mk] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvojot rank e #%i: %s. Sleden rank: %s.
@@ -23,6 +26,9 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rSpisok so XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Dobi %i XP za ubistvoto na %s
+CRXRANKS_NOTIFY_KILL_LOSE = Izgubi %i XP za ubistvoto na %s
+CRXRANKS_NOTIFY_SUICIDE = Izgubi %i XP zatoa shto izvrshi samoubistvo.
 
 [bg] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvoqt rank e #%i: %s. Sledvasht rank: %s.
@@ -36,6 +42,9 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rSpisuk s XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Poluchi %i XP za ubiistvoto na %s
+CRXRANKS_NOTIFY_KILL_LOSE = Izgubi %i XP za ubiistvoto na %s
+CRXRANKS_NOTIFY_SUICIDE = Izgubi %i XP zashtoto izvurshi samoubiistvo.
 
 [bp] -- tarsisd2
 CRXRANKS_RANKINFO_NORMAL = Voce tem %i/%i XP. Seu rank #%i: %s. Proximo rank: %s.
