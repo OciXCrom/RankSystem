@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.6"
+#define PLUGIN_VERSION "2.6.1"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -464,7 +464,7 @@ ReadFile()
 
 public client_connect(id)
 {
-	reset_stats(id)
+	reset_player_stats(id)
 	
 	new szInfo[MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
@@ -845,7 +845,7 @@ get_user_saveinfo(const id, szInfo[MAX_PLAYER_INFO_LENGTH], const iLen)
 	}
 }
 
-reset_stats(const id)
+reset_player_stats(const id)
 {
 	g_ePlayerData[id][XP] = 0
 	g_ePlayerData[id][Level] = 0
