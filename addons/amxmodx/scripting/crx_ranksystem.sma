@@ -23,7 +23,7 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.6.1"
+#define PLUGIN_VERSION "2.6.2"
 #define DELAY_ON_CONNECT 5.0
 #define HUD_REFRESH_FREQ 1.0
 #define DELAY_ON_CHANGE 0.1
@@ -698,17 +698,17 @@ public OnPlayerKilled()
 	}
 	
 	@GIVE_REWARD:
-	give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
+	new iXP = give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
 
-	if(g_eSettings[NOTIFY_ON_KILL] && iReward != 0)
+	if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
 	{
 		if(iAttacker == iVictim)
-			CC_SendMessage(iAttacker, "%L", iAttacker, "CRXRANKS_NOTIFY_SUICIDE", abs(iReward))
+			CC_SendMessage(iAttacker, "%L", iAttacker, "CRXRANKS_NOTIFY_SUICIDE", abs(iXP))
 		else
 		{
 			new szName[MAX_NAME_LENGTH]
 			get_user_name(iVictim, szName, charsmax(szName))
-			CC_SendMessage(iAttacker, "%L", iAttacker, iReward >= 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iReward), szName)
+			CC_SendMessage(iAttacker, "%L", iAttacker, iXP >= 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
 		}
 	}
 }
@@ -771,18 +771,18 @@ get_xp_reward(const id, const szKey[])
 give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 {
 	if(!iXP)
-		return
+		return 0
 
 	if(g_eSettings[IGNORE_BOTS] && g_ePlayerData[id][IsBot])
-		return
+		return 0
 
 	if(iSource == CRXRANKS_XPS_REWARD)
 	{
 		if(g_eSettings[MINIMUM_PLAYERS] && get_playersnum() < g_eSettings[MINIMUM_PLAYERS])
-			return;
+			return 0
 
 		if(g_eSettings[TEAM_LOCK] && get_user_team(id) != g_eSettings[TEAM_LOCK])
-			return
+			return 0
 	}
 		
 	static iReturn
@@ -790,7 +790,7 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 	
 	switch(iReturn)
 	{
-		case CRXRANKS_HANDLED: return
+		case CRXRANKS_HANDLED: return 0
 		case CRXRANKS_CONTINUE: { }
 		default:
 		{
@@ -832,7 +832,9 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 			else set_hudmessage(XP_NOTIFIER_PARAMS_LOSE)				
 			ShowSyncHudMsg(id, g_iObject[OBJ_XP_NOTIFIER], "%L", id, szKey, iXP)
 		}
-	}			
+	}
+
+	return iXP
 }
 
 get_user_saveinfo(const id, szInfo[MAX_PLAYER_INFO_LENGTH], const iLen)
