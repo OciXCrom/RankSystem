@@ -58,6 +58,9 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \ySistema de Rank: \rLista de XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Voce ganhou %i XP por matar %s
+CRXRANKS_NOTIFY_KILL_LOSE = Voce perdeu %i XP por matar %s
+CRXRANKS_NOTIFY_SUICIDE = Voce perdeu %i XP por suicidar.
 
 [ro] -- DevilBoy.eXe
 CRXRANKS_RANKINFO_NORMAL = Ai %i/%i XP. Rangul tau este #%i: %s. Urmatorul rang: %s.
