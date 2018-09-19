@@ -25,7 +25,9 @@ forward crxranks_user_level_updated(id, level, bool:levelup)
  * @param xp	 		Amount of XP ready to be received.
  * @param source	 	The XP source.
  * @return              CRXRANKS_STOP to prevent the XP from being added,
- *                      CRXRANKS_CONTINUE to let the XP pass through
+ *                      CRXRANKS_CONTINUE to let the XP pass through,
+ *                      any integer value to modify the amount of XP that
+ *                      is going to be received
  */
 forward crxranks_user_receive_xp(id, xp, CRXRanks_XPSources:source)
 
@@ -203,7 +205,7 @@ native crxranks_give_user_xp(id, amount = 0, reward[] = "", CRXRanks_XPSources:s
  * 
  * @return				True if it is, false otherwise.
  */
-native bool:crxranks_hi_is_using_dhud()
+native bool:crxranks_is_hi_using_dhud()
 
 /** 
  * Checks if the HUD information system is enabled.
@@ -250,6 +252,13 @@ native bool:crxranks_is_user_vip(id)
 native bool:crxranks_is_xpn_enabled()
 
 /** 
+ * Checks if the XP notifier system is using DHUD messages.
+ * 
+ * @return				True if it is, false otherwise.
+ */
+native bool:crxranks_is_xpn_using_dhud()
+
+/** 
  * Sets the exact amount of XP that th client has.
  *
  * @param id		 	Client index.
@@ -265,10 +274,3 @@ native crxranks_set_user_xp(id, amount, CRXRanks_XPSources:source = CRXRANKS_XPS
  * @return				True if it is, false otherwise.
  */
 native bool:crxranks_using_combined_events()
-
-/** 
- * Checks if the XP notifier system is using DHUD messages.
- * 
- * @return				True if it is, false otherwise.
- */
-native bool:crxranks_xpn_is_using_dhud()

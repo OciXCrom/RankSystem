@@ -23,42 +23,37 @@ new CC_PREFIX[64]
 	#define client_disconnect client_disconnected
 #endif
 
-#define PLUGIN_VERSION "2.6.2"
-#define DELAY_ON_CONNECT 5.0
-#define HUD_REFRESH_FREQ 1.0
-#define DELAY_ON_CHANGE 0.1
-#define MAX_HUDINFO_LENGTH 192
-#define MAX_SOUND_LENGTH 128
-#define MAX_PLAYER_INFO_LENGTH 35
-#define MAX_RANK_LENGTH 32
-#define MAX_XP_REWARD_LENGTH 32
-#define MAX_XP_LENGTH 16
-#define TASK_HUD 304500
+new const PLUGIN_VERSION[] = "2.7"
+const Float:DELAY_ON_CONNECT = 5.0
+const Float:HUD_REFRESH_FREQ = 1.0
+const Float:DELAY_ON_CHANGE = 0.1
+const MAX_SOUND_LENGTH = 128
+const TASK_HUD = 304500
 
 #if !defined MAX_NAME_LENGTH
-	#define MAX_NAME_LENGTH 32
+const MAX_NAME_LENGTH = 32
 #endif
 
-#define ARG_CURRENT_XP 			"$current_xp$"
-#define ARG_NEXT_XP 			"$next_xp$"
-#define ARG_XP_NEEDED 			"$xp_needed$"
-#define ARG_LEVEL 				"$level$"
-#define ARG_NEXT_LEVEL 			"$next_level$"
-#define ARG_RANK 				"$rank$"
-#define ARG_NEXT_RANK 			"$next_rank$"
-#define ARG_MAX_LEVELS			"$max_levels$"
-#define ARG_LINE_BREAK 			"$br$"
-#define ARG_NAME 				"$name$"
+new const ARG_CURRENT_XP[]          = "$current_xp$"
+new const ARG_NEXT_XP[]             = "$next_xp$"
+new const ARG_XP_NEEDED[]           = "$xp_needed$"
+new const ARG_LEVEL[]               = "$level$"
+new const ARG_NEXT_LEVEL[]          = "$next_level$"
+new const ARG_RANK[]                = "$rank$"
+new const ARG_NEXT_RANK[]           = "$next_rank$"
+new const ARG_MAX_LEVELS[]          = "$max_levels$"
+new const ARG_LINE_BREAK[]          = "$br$"
+new const ARG_NAME[]                = "$name$"
 
-#define XPREWARD_KILL			"kill"
-#define XPREWARD_HEADSHOT 		"headshot"
-#define XPREWARD_TEAMKILL 		"teamkill"
-#define XPREWARD_SUICIDE 		"suicide"
+new const XPREWARD_KILL[]           = "kill"
+new const XPREWARD_HEADSHOT[]       = "headshot"
+new const XPREWARD_TEAMKILL[]       = "teamkill"
+new const XPREWARD_SUICIDE[]        = "suicide"
 
 #if defined USE_CSTRIKE
-	#define XPREWARD_BOMB_PLANTED 	"bomb_planted"
-	#define XPREWARD_BOMB_DEFUSED 	"bomb_defused"
-	#define XPREWARD_BOMB_EXPLODED 	"bomb_exploded"
+new const XPREWARD_BOMB_PLANTED[]   = "bomb_planted"
+new const XPREWARD_BOMB_DEFUSED[]   = "bomb_defused"
+new const XPREWARD_BOMB_EXPLODED[]  = "bomb_exploded"
 #endif
 
 #define clr(%1) %1 == -1 ? random(256) : %1
@@ -72,19 +67,19 @@ g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .hol
 #define XP_NOTIFIER_PARAMS_LOSE clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][0]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][1]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][2]),\
 g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .holdtime = g_eSettings[XP_NOTIFIER_DURATION]
 
-enum
+enum _:Vault
 {
 	VAULT_WRITE = 0,
 	VAULT_READ
 }
 
-enum
+enum _:Objects
 {
 	OBJ_HUDINFO = 0,
 	OBJ_XP_NOTIFIER
 }
 
-enum
+enum _:SaveTypes
 {
 	SAVE_NICKNAME = 0,
 	SAVE_IP,
@@ -104,9 +99,9 @@ enum _:PlayerData
 	XP,
 	Level,
 	NextXP,
-	Rank[MAX_RANK_LENGTH],
-	NextRank[MAX_RANK_LENGTH],
-	HUDInfo[MAX_HUDINFO_LENGTH],
+	Rank[CRXRANKS_MAX_RANK_LENGTH],
+	NextRank[CRXRANKS_MAX_RANK_LENGTH],
+	HUDInfo[CRXRANKS_MAX_HUDINFO_LENGTH],
 	bool:IsOnFinalLevel,
 	bool:IsVIP,
 	bool:IsBot
@@ -139,8 +134,8 @@ enum _:Settings
 	HUDINFO_COLOR[3],
 	Float:HUDINFO_POSITION[2],
 	bool:HUDINFO_USE_DHUD,
-	HUDINFO_FORMAT[MAX_HUDINFO_LENGTH],
-	HUDINFO_FORMAT_FINAL[MAX_HUDINFO_LENGTH],
+	HUDINFO_FORMAT[CRXRANKS_MAX_HUDINFO_LENGTH],
+	HUDINFO_FORMAT_FINAL[CRXRANKS_MAX_HUDINFO_LENGTH],
 	HUDINFO_INVALID_TEXT[32],
 	bool:XP_NOTIFIER_ENABLED,
 	XP_NOTIFIER_COLOR_GET[3],
@@ -152,7 +147,7 @@ enum _:Settings
 
 new g_eSettings[Settings]
 new g_ePlayerData[33][PlayerData]
-new g_szMaxLevels[MAX_XP_LENGTH]
+new g_szMaxLevels[CRXRANKS_MAX_XP_LENGTH]
 new Array:g_aLevels
 new Array:g_aRankNames
 new Trie:g_tXPRewards
@@ -160,9 +155,10 @@ new Trie:g_tXPRewardsVIP
 
 new g_iVault
 new g_iMaxLevels
-new g_iObject[2]
-new g_iScreenFade
 new g_iFlagZ
+new g_iScreenFade
+new g_iObject[2]
+
 new g_fwdUserLevelUpdated
 new g_fwdUserReceiveXP
 new g_fwdUserXPUpdated
@@ -171,35 +167,41 @@ public plugin_init()
 {
 	register_plugin("OciXCrom's Rank System", PLUGIN_VERSION, "OciXCrom")
 	register_cvar("CRXRankSystem", PLUGIN_VERSION, FCVAR_SERVER|FCVAR_SPONLY|FCVAR_UNLOGGED)
-	register_event("DeathMsg", "OnPlayerKilled", "a")
 	
 	#if defined USE_CSTRIKE
 	register_dictionary("RankSystem.txt")
 	#else
 	register_dictionary("RankSystemNoColors.txt")
 	#endif
+
+	register_event("DeathMsg", "OnPlayerKilled", "a")
 	
-	register_clcmd("say /xplist", "Cmd_XPList", ADMIN_BAN)
-	register_clcmd("say_team /xplist", "Cmd_XPList", ADMIN_BAN)
-	register_concmd("crxranks_give_xp", "Cmd_GiveXP", ADMIN_RCON, "<nick|#userid> <amount>")
+	register_clcmd("say /xplist",        "Cmd_XPList",  ADMIN_BAN)
+	register_clcmd("say_team /xplist",   "Cmd_XPList",  ADMIN_BAN)
+	register_concmd("crxranks_give_xp",  "Cmd_GiveXP",  ADMIN_RCON, "<nick|#userid> <amount>")
 	register_concmd("crxranks_reset_xp", "Cmd_ResetXP", ADMIN_RCON, "<nick|#userid>")
 	
 	if(g_eSettings[LEVELUP_SCREEN_FADE_ENABLED] || g_eSettings[LEVELDN_SCREEN_FADE_ENABLED])
+	{
 		g_iScreenFade = get_user_msgid("ScreenFade")
+	}
 
 	g_fwdUserLevelUpdated = CreateMultiForward("crxranks_user_level_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
-	g_fwdUserReceiveXP = CreateMultiForward("crxranks_user_receive_xp", ET_STOP, FP_CELL, FP_CELL, FP_CELL)
-	g_fwdUserXPUpdated = CreateMultiForward("crxranks_user_xp_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
+	g_fwdUserReceiveXP    = CreateMultiForward("crxranks_user_receive_xp",    ET_STOP,   FP_CELL, FP_CELL, FP_CELL)
+	g_fwdUserXPUpdated    = CreateMultiForward("crxranks_user_xp_updated",    ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
 }
 
 public plugin_precache()
 {
 	g_aLevels = ArrayCreate(16)
 	ArrayPushCell(g_aLevels, 0)
+
 	g_aRankNames = ArrayCreate(32)
 	ArrayPushString(g_aRankNames, "")
+
 	g_tXPRewards = TrieCreate()
 	g_tXPRewardsVIP = TrieCreate()
+
 	ReadFile()
 }
 
@@ -215,9 +217,9 @@ public plugin_end()
 
 ReadFile()
 {
-	new szConfigsName[256], szFilename[256]
-	get_configsdir(szConfigsName, charsmax(szConfigsName))
-	formatex(szFilename, charsmax(szFilename), "%s/RankSystem.ini", szConfigsName)
+	new szFilename[256]
+	get_configsdir(szFilename, charsmax(szFilename))
+	add(szFilename, charsmax(szFilename), "/RankSystem.ini")
 	
 	new iFilePointer = fopen(szFilename, "rt")
 	
@@ -277,13 +279,17 @@ ReadFile()
 				default:
 				{
 					if(!bRead || iSection == SECTION_NONE)
+					{
 						continue
+					}
 						
 					strtok(szData, szKey, charsmax(szKey), szValue, charsmax(szValue), '=')
 					trim(szKey); trim(szValue)
 							
 					if(!szValue[0])
+					{
 						continue
+					}
 						
 					switch(iSection)
 					{
@@ -298,7 +304,9 @@ ReadFile()
 								#endif
 							}
 							else if(equal(szKey, "SAVE_TYPE"))
+							{
 								g_eSettings[SAVE_TYPE] = clamp(str_to_num(szValue), SAVE_NICKNAME, SAVE_STEAMID)
+							}
 							else if(equal(szKey, "XP_COMMANDS"))
 							{
 								while(szValue[0] != 0 && strtok(szValue, szKey, charsmax(szKey), szValue, charsmax(szValue), ','))
@@ -308,38 +316,52 @@ ReadFile()
 								}
 							}
 							else if(equal(szKey, "LEVELUP_MESSAGE_TYPE"))
+							{
 								g_eSettings[LEVELUP_MESSAGE_TYPE] = clamp(str_to_num(szValue), 0, 2)
+							}
 							else if(equal(szKey, "LEVELUP_SOUND"))
 							{
 								copy(g_eSettings[LEVELUP_SOUND], charsmax(g_eSettings[LEVELUP_SOUND]), szValue)
 								
 								if(szValue[0])
+								{
 									precache_sound(szValue)
+								}
 							}
 							else if(equal(szKey, "LEVELUP_SCREEN_FADE_ENABLED"))
+							{
 								g_eSettings[LEVELUP_SCREEN_FADE_ENABLED] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "LEVELUP_SCREEN_FADE_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]), szTemp[3], charsmax(szTemp[]))
 								
 								for(i = 0; i < 4; i++)
+								{
 									g_eSettings[LEVELUP_SCREEN_FADE_COLOR][i] = clamp(str_to_num(szTemp[i]), -1, 255)
+								}
 							}
 							else if(equal(szKey, "LEVELDN_SOUND"))
 							{
 								copy(g_eSettings[LEVELDN_SOUND], charsmax(g_eSettings[LEVELDN_SOUND]), szValue)
 								
 								if(szValue[0])
+								{
 									precache_sound(szValue)
+								}
 							}
 							else if(equal(szKey, "LEVELDN_SCREEN_FADE_ENABLED"))
+							{
 								g_eSettings[LEVELDN_SCREEN_FADE_ENABLED] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "LEVELDN_SCREEN_FADE_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]), szTemp[3], charsmax(szTemp[]))
 								
 								for(i = 0; i < 4; i++)
+								{
 									g_eSettings[LEVELDN_SCREEN_FADE_COLOR][i] = clamp(str_to_num(szTemp[i]), -1, 255)
+								}
 							}
 							else if(equal(szKey, "FINAL_LEVEL_FLAGS"))
 							{
@@ -358,81 +380,123 @@ ReadFile()
 								copy(g_eSettings[VAULT_NAME], charsmax(g_eSettings[VAULT_NAME]), szValue)
 							}
 							else if(equal(szKey, "TEAM_LOCK"))
+							{
 								g_eSettings[TEAM_LOCK] = str_to_num(szValue)
+							}
 							else if(equal(szKey, "MINIMUM_PLAYERS"))
+							{
 								g_eSettings[MINIMUM_PLAYERS] = clamp(str_to_num(szValue), 0, 32)
+							}
 							else if(equal(szKey, "IGNORE_BOTS"))
+							{
 								g_eSettings[IGNORE_BOTS] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "USE_COMBINED_EVENTS"))
+							{
 								g_eSettings[USE_COMBINED_EVENTS] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "NOTIFY_ON_KILL"))
+							{
 								g_eSettings[NOTIFY_ON_KILL] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "HUDINFO_ENABLED"))
+							{
 								g_eSettings[HUDINFO_ENABLED] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "HUDINFO_ALIVE_ONLY"))
+							{
 								g_eSettings[HUDINFO_ALIVE_ONLY] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "HUDINFO_TEAM_LOCK"))
+							{
 								g_eSettings[HUDINFO_TEAM_LOCK] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "HUDINFO_OTHER_PLAYERS"))
+							{
 								g_eSettings[HUDINFO_OTHER_PLAYERS] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "HUDINFO_COLOR"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]))
 								
 								for(i = 0; i < 3; i++)
+								{
 									g_eSettings[HUDINFO_COLOR][i] = clamp(str_to_num(szTemp[i]), -1, 255)
+								}
 							}
 							else if(equal(szKey, "HUDINFO_POSITION"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]))
 								
 								for(i = 0; i < 2; i++)
+								{
 									g_eSettings[HUDINFO_POSITION][i] = _:floatclamp(str_to_float(szTemp[i]), -1.0, 1.0)
+								}
 							}
 							else if(equal(szKey, "HUDINFO_USE_DHUD"))
 							{
 								g_eSettings[HUDINFO_USE_DHUD] = _:clamp(str_to_num(szValue), false, true)
 								
 								if(!g_eSettings[HUDINFO_USE_DHUD])
+								{
 									g_iObject[OBJ_HUDINFO] = CreateHudSyncObj()
+								}
 							}
 							else if(equal(szKey, "HUDINFO_FORMAT"))
+							{
 								copy(g_eSettings[HUDINFO_FORMAT], charsmax(g_eSettings[HUDINFO_FORMAT]), szValue)
+							}
 							else if(equal(szKey, "HUDINFO_FORMAT_FINAL"))
+							{
 								copy(g_eSettings[HUDINFO_FORMAT_FINAL], charsmax(g_eSettings[HUDINFO_FORMAT_FINAL]), szValue)
+							}
 							else if(equal(szKey, "HUDINFO_INVALID_TEXT"))
+							{
 								copy(g_eSettings[HUDINFO_INVALID_TEXT], charsmax(g_eSettings[HUDINFO_INVALID_TEXT]), szValue)
+							}
 							else if(equal(szKey, "XP_NOTIFIER_ENABLED"))
+							{
 								g_eSettings[XP_NOTIFIER_ENABLED] = _:clamp(str_to_num(szValue), false, true)
+							}
 							else if(equal(szKey, "XP_NOTIFIER_COLOR_GET"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]))
 								
 								for(i = 0; i < 3; i++)
+								{
 									g_eSettings[XP_NOTIFIER_COLOR_GET][i] = clamp(str_to_num(szTemp[i]), -1, 255)
+								}
 							}
 							else if(equal(szKey, "XP_NOTIFIER_COLOR_LOSE"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]), szTemp[2], charsmax(szTemp[]))
 								
 								for(i = 0; i < 3; i++)
+								{
 									g_eSettings[XP_NOTIFIER_COLOR_LOSE][i] = clamp(str_to_num(szTemp[i]), -1, 255)
+								}
 							}
 							else if(equal(szKey, "XP_NOTIFIER_POSITION"))
 							{
 								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]))
 								
 								for(i = 0; i < 2; i++)
+								{
 									g_eSettings[XP_NOTIFIER_POSITION][i] = _:floatclamp(str_to_float(szTemp[i]), -1.0, 1.0)
+								}
 							}
 							else if(equal(szKey, "XP_NOTIFIER_DURATION"))
+							{
 								g_eSettings[XP_NOTIFIER_DURATION] = _:floatclamp(str_to_float(szValue), 0.0, float(cellmax))
+							}
 							else if(equal(szKey, "XP_NOTIFIER_USE_DHUD"))
 							{
 								g_eSettings[XP_NOTIFIER_USE_DHUD] = _:clamp(str_to_num(szValue), false, true)
 								
 								if(!g_eSettings[XP_NOTIFIER_USE_DHUD])
+								{
 									g_iObject[OBJ_XP_NOTIFIER] = CreateHudSyncObj()
+								}
 							}
 						}
 						case SECTION_RANKS:
@@ -450,7 +514,9 @@ ReadFile()
 							TrieSetCell(g_tXPRewards, szKey, str_to_num(szReward[0]))
 							
 							if(szReward[1][0])
+							{
 								TrieSetCell(g_tXPRewardsVIP, szKey, str_to_num(szReward[1]))
+							}
 						}
 					}
 				}
@@ -466,19 +532,22 @@ public client_connect(id)
 {
 	reset_player_stats(id)
 	
-	new szInfo[MAX_PLAYER_INFO_LENGTH]
+	new szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
 	use_vault(id, szInfo, VAULT_READ)
-	g_ePlayerData[id][IsBot] = !!is_user_bot(id)
+
+	g_ePlayerData[id][IsBot] = is_user_bot(id) != 0
 	set_task(DELAY_ON_CONNECT, "update_vip_status", id)
 	
 	if(g_eSettings[HUDINFO_ENABLED])
+	{
 		set_task(HUD_REFRESH_FREQ, "DisplayHUD", id + TASK_HUD, .flags = "b")
+	}
 }
 
 public client_disconnect(id)
 {
-	new szInfo[MAX_PLAYER_INFO_LENGTH]
+	new szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
 	use_vault(id, szInfo, VAULT_WRITE)
 	remove_task(id + TASK_HUD)
@@ -487,7 +556,9 @@ public client_disconnect(id)
 public client_infochanged(id)
 {
 	if(!is_user_connected(id))
+	{
 		return
+	}
 		
 	static const szKey[] = "name"
 	static szNewName[MAX_NAME_LENGTH], szOldName[MAX_NAME_LENGTH]
@@ -517,17 +588,25 @@ public DisplayHUD(id)
 	if(!is_user_alive(id))
 	{		
 		if(g_eSettings[HUDINFO_ALIVE_ONLY])
+		{
 			return
+		}
 			
 		if(g_eSettings[HUDINFO_OTHER_PLAYERS])
+		{
 			iTarget = pev(id, pev_iuser2)
+		}
 	}
 	
 	if(!iTarget)
+	{
 		return
+	}
 
 	if(g_eSettings[TEAM_LOCK] && g_eSettings[HUDINFO_TEAM_LOCK] && get_user_team(iTarget) != g_eSettings[TEAM_LOCK])
+	{
 		return
+	}
 	
 	if(g_eSettings[HUDINFO_USE_DHUD])
 	{
@@ -543,22 +622,30 @@ public DisplayHUD(id)
 
 #if defined USE_CSTRIKE
 public bomb_planted(id)
+{
 	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_PLANTED), CRXRANKS_XPS_REWARD)
+}
 	
 public bomb_defused(id)
+{
 	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_DEFUSED), CRXRANKS_XPS_REWARD)
+}
 	
 public bomb_explode(id)
+{
 	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_EXPLODED), CRXRANKS_XPS_REWARD)
+}
 #endif
 
 public Cmd_XP(id)
 {	
 	if(g_ePlayerData[id][Level] == g_iMaxLevels)
-		send_message(id, false, "%L", id, "CRXRANKS_RANKINFO_FINAL", g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+	{
+		send_chat_message(id, false, "%L", id, "CRXRANKS_RANKINFO_FINAL", g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+	}
 	else
 	{
-		send_message(id, false, "%L", id, "CRXRANKS_RANKINFO_NORMAL", g_ePlayerData[id][XP], g_ePlayerData[id][NextXP],\
+		send_chat_message(id, false, "%L", id, "CRXRANKS_RANKINFO_NORMAL", g_ePlayerData[id][XP], g_ePlayerData[id][NextXP],\
 		g_ePlayerData[id][Level], g_ePlayerData[id][Rank], g_ePlayerData[id][NextRank])
 	}
 	
@@ -568,7 +655,9 @@ public Cmd_XP(id)
 public Cmd_XPList(id, iLevel, iCid)
 {
 	if(!cmd_access(id, iLevel, iCid, 1))
+	{
 		return PLUGIN_HANDLED
+	}
 		
 	new szTitle[128]
 	formatex(szTitle, charsmax(szTitle), "%L", id, "CRXRANKS_MENU_TITLE")
@@ -597,7 +686,9 @@ public XPList_Handler(id, iMenu, iItem)
 public Cmd_GiveXP(id, iLevel, iCid)
 {	
 	if(!cmd_access(id, iLevel, iCid, 3))
+	{
 		return PLUGIN_HANDLED
+	}
 	
 	new szPlayer[MAX_NAME_LENGTH]
 	read_argv(1, szPlayer, charsmax(szPlayer))
@@ -605,9 +696,11 @@ public Cmd_GiveXP(id, iLevel, iCid)
 	new iPlayer = cmd_target(id, szPlayer, 0)
 	
 	if(!iPlayer)
+	{
 		return PLUGIN_HANDLED
+	}
 		
-	new szName[2][MAX_NAME_LENGTH], szAmount[MAX_XP_LENGTH]
+	new szName[2][MAX_NAME_LENGTH], szAmount[CRXRANKS_MAX_XP_LENGTH]
 	read_argv(2, szAmount, charsmax(szAmount))
 	get_user_name(id, szName[0], charsmax(szName[]))
 	get_user_name(iPlayer, szName[1], charsmax(szName[]))
@@ -616,21 +709,25 @@ public Cmd_GiveXP(id, iLevel, iCid)
 	give_user_xp(iPlayer, iXP, CRXRANKS_XPS_ADMIN)
 	
 	if(iXP >= 0)
+	{
 		copy(szKey, charsmax(szKey), "CRXRANKS_GIVE_XP")
+	}
 	else
 	{
 		copy(szKey, charsmax(szKey), "CRXRANKS_TAKE_XP")
 		iXP *= -1
 	}
 	
-	send_message(0, true, "%L", id, szKey, szName[0], iXP, szName[1])
+	send_chat_message(0, true, "%L", id, szKey, szName[0], iXP, szName[1])
 	return PLUGIN_HANDLED
 }
 
 public Cmd_ResetXP(id, iLevel, iCid)
 {	
 	if(!cmd_access(id, iLevel, iCid, 2))
+	{
 		return PLUGIN_HANDLED
+	}
 	
 	new szPlayer[MAX_NAME_LENGTH]
 	read_argv(1, szPlayer, charsmax(szPlayer))
@@ -638,14 +735,18 @@ public Cmd_ResetXP(id, iLevel, iCid)
 	new iPlayer = cmd_target(id, szPlayer, CMDTARGET_OBEY_IMMUNITY|CMDTARGET_ALLOW_SELF)
 	
 	if(!iPlayer)
+	{
 		return PLUGIN_HANDLED
+	}
 		
 	new szName[2][MAX_NAME_LENGTH]
 	get_user_name(id, szName[0], charsmax(szName[]))
 	get_user_name(iPlayer, szName[1], charsmax(szName[]))
+
 	g_ePlayerData[iPlayer][XP] = 0
 	check_level(iPlayer, true)
-	send_message(0, true, "%L", id, "CRXRANKS_RESET_XP", szName[0], szName[1])
+	send_chat_message(0, true, "%L", id, "CRXRANKS_RESET_XP", szName[0], szName[1])
+
 	return PLUGIN_HANDLED
 }
 
@@ -654,7 +755,9 @@ public OnPlayerKilled()
 	new iAttacker = read_data(1), iVictim = read_data(2)
 	
 	if(!is_user_connected(iAttacker) || !is_user_connected(iVictim))
+	{
 		return
+	}
 		
 	new iReward, iTemp
 	
@@ -664,7 +767,9 @@ public OnPlayerKilled()
 		iReward += iTemp
 		
 		if(should_skip(iTemp))
+		{
 			goto @GIVE_REWARD
+		}
 	}
 	else if(get_user_team(iAttacker) == get_user_team(iVictim))
 	{
@@ -672,7 +777,9 @@ public OnPlayerKilled()
 		iReward += iTemp
 		
 		if(should_skip(iTemp))
+		{
 			goto @GIVE_REWARD
+		}
 	}
 	else
 	{
@@ -683,7 +790,9 @@ public OnPlayerKilled()
 		iReward += iTemp
 		
 		if(should_skip(iTemp))
+		{
 			goto @GIVE_REWARD
+		}
 			
 		if(read_data(3))
 		{
@@ -691,7 +800,9 @@ public OnPlayerKilled()
 			iReward += iTemp
 			
 			if(should_skip(iTemp))
+			{
 				goto @GIVE_REWARD
+			}
 		}
 		
 		iReward += get_xp_reward(iAttacker, XPREWARD_KILL)
@@ -703,7 +814,9 @@ public OnPlayerKilled()
 	if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
 	{
 		if(iAttacker == iVictim)
+		{
 			CC_SendMessage(iAttacker, "%L", iAttacker, "CRXRANKS_NOTIFY_SUICIDE", abs(iXP))
+		}
 		else
 		{
 			new szName[MAX_NAME_LENGTH]
@@ -716,9 +829,13 @@ public OnPlayerKilled()
 public sort_players_by_xp(id1, id2)
 {
 	if(g_ePlayerData[id1][XP] > g_ePlayerData[id2][XP])
+	{
 		return -1
+	}
 	else if(g_ePlayerData[id1][XP] < g_ePlayerData[id2][XP])
+	{
 		return 1
+	}
 	
 	return 0
 }
@@ -726,13 +843,15 @@ public sort_players_by_xp(id1, id2)
 use_vault(const id, const szInfo[], const iType)
 {
 	if(!szInfo[0])
+	{
 		return
+	}
 		
 	switch(iType)
 	{
 		case VAULT_WRITE:
 		{
-			static szData[MAX_XP_LENGTH]
+			static szData[CRXRANKS_MAX_XP_LENGTH]
 			num_to_str(g_ePlayerData[id][XP], szData, charsmax(szData))
 			nvault_set(g_iVault, szInfo, szData)
 		}
@@ -771,18 +890,26 @@ get_xp_reward(const id, const szKey[])
 give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 {
 	if(!iXP)
+	{
 		return 0
+	}
 
 	if(g_eSettings[IGNORE_BOTS] && g_ePlayerData[id][IsBot])
+	{
 		return 0
+	}
 
 	if(iSource == CRXRANKS_XPS_REWARD)
 	{
 		if(g_eSettings[MINIMUM_PLAYERS] && get_playersnum() < g_eSettings[MINIMUM_PLAYERS])
+		{
 			return 0
+		}
 
 		if(g_eSettings[TEAM_LOCK] && get_user_team(id) != g_eSettings[TEAM_LOCK])
+		{
 			return 0
+		}
 	}
 		
 	static iReturn
@@ -795,14 +922,18 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 		default:
 		{
 			if(iReturn != 0)
+			{
 				iXP = iReturn
+			}
 		}
 	}
 		
 	g_ePlayerData[id][XP] += iXP
 	
 	if(g_ePlayerData[id][XP] < 0)
+	{
 		g_ePlayerData[id][XP] = 0
+	}
 	
 	check_level(id, true)
 	ExecuteForward(g_fwdUserXPUpdated, iReturn, id, g_ePlayerData[id][XP], iSource)
@@ -812,32 +943,40 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 		static szKey[32], bool:bPositive
 		bPositive = iXP >= 0
 		
-		if(bPositive)
-			copy(szKey, charsmax(szKey), "CRXRANKS_XP_NOTIFIER_GET")
-		else
-		{
-			copy(szKey, charsmax(szKey), "CRXRANKS_XP_NOTIFIER_LOSE")
-			iXP *= -1
-		}
+		copy(szKey, charsmax(szKey), bPositive ? "CRXRANKS_XP_NOTIFIER_GET" : "CRXRANKS_XP_NOTIFIER_LOSE")
 			
 		if(g_eSettings[XP_NOTIFIER_USE_DHUD])
 		{
-			if(bPositive) set_dhudmessage(XP_NOTIFIER_PARAMS_GET)
-			else set_dhudmessage(XP_NOTIFIER_PARAMS_LOSE)				
-			show_dhudmessage(id, "%L", id, szKey, iXP)
+			if(bPositive)
+			{
+				set_dhudmessage(XP_NOTIFIER_PARAMS_GET)
+			}
+			else
+			{
+				set_dhudmessage(XP_NOTIFIER_PARAMS_LOSE)
+			}
+
+			show_dhudmessage(id, "%L", id, szKey, abs(iXP))
 		}
 		else
 		{
-			if(bPositive) set_hudmessage(XP_NOTIFIER_PARAMS_GET)
-			else set_hudmessage(XP_NOTIFIER_PARAMS_LOSE)				
-			ShowSyncHudMsg(id, g_iObject[OBJ_XP_NOTIFIER], "%L", id, szKey, iXP)
+			if(bPositive)
+			{
+				set_hudmessage(XP_NOTIFIER_PARAMS_GET)
+			}
+			else
+			{
+				set_hudmessage(XP_NOTIFIER_PARAMS_LOSE)
+			}
+
+			ShowSyncHudMsg(id, g_iObject[OBJ_XP_NOTIFIER], "%L", id, szKey, abs(iXP))
 		}
 	}
 
 	return iXP
 }
 
-get_user_saveinfo(const id, szInfo[MAX_PLAYER_INFO_LENGTH], const iLen)
+get_user_saveinfo(const id, szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH], const iLen)
 {
 	switch(g_eSettings[SAVE_TYPE])
 	{
@@ -861,12 +1000,16 @@ reset_player_stats(const id)
 }
 
 bool:has_argument(const szMessage[], const szArg[])
+{
 	return contain(szMessage, szArg) != -1
+}
 	
 bool:should_skip(const iNum)
+{
 	return (iNum != 0 && !g_eSettings[USE_COMBINED_EVENTS])
+}
 	
-send_message(const id, const bool:bLog, const szInput[], any:...)
+send_chat_message(const id, const bool:bLog, const szInput[], any:...)
 {
 	static szMessage[192]
 	vformat(szMessage, charsmax(szMessage), szInput, 4)
@@ -878,16 +1021,20 @@ send_message(const id, const bool:bLog, const szInput[], any:...)
 	client_print(id, print_chat, szMessage)
 	
 	if(bLog)
+	{
 		log_amx(szMessage)
+	}
 	#endif
 }
 
 update_hudinfo(const id)
 {
 	if(!g_eSettings[HUDINFO_ENABLED])
+	{
 		return
+	}
 		
-	static szMessage[MAX_HUDINFO_LENGTH], szPlaceHolder[32], bool:bIsOnFinal
+	static szMessage[CRXRANKS_MAX_HUDINFO_LENGTH], szPlaceHolder[32], bool:bIsOnFinal
 	bIsOnFinal = g_ePlayerData[id][IsOnFinalLevel]
 	copy(szMessage, charsmax(szMessage), g_eSettings[bIsOnFinal ? HUDINFO_FORMAT_FINAL : HUDINFO_FORMAT])
 	
@@ -921,8 +1068,7 @@ update_hudinfo(const id)
 		replace_all(szMessage, charsmax(szMessage), ARG_NEXT_LEVEL, szPlaceHolder)
 	}
 	
-	if(has_argument(szMessage, ARG_MAX_LEVELS))
-		replace_all(szMessage, charsmax(szMessage), ARG_MAX_LEVELS, g_szMaxLevels)
+	replace_all(szMessage, charsmax(szMessage), ARG_MAX_LEVELS, g_szMaxLevels)
 
 	if(has_argument(szMessage, ARG_NAME))
 	{
@@ -945,7 +1091,9 @@ check_level(const id, const bool:bNotify)
 	for(i = 1; i < g_iMaxLevels + 1; i++)
 	{
 		if(g_ePlayerData[id][XP] >= ArrayGetCell(g_aLevels, i))
+		{
 			iLevel++
+		}
 	}
 	
 	if(iLevel != g_ePlayerData[id][Level])
@@ -984,12 +1132,16 @@ check_level(const id, const bool:bNotify)
 			
 			formatex(szMessage, charsmax(szMessage), "%L", bGlobalMsg ? LANG_PLAYER : id,\
 			bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
-			send_message(bGlobalMsg ? 0 : id, false, szMessage)
+			send_chat_message(bGlobalMsg ? 0 : id, false, szMessage)
 			
 			if(bLevelUp && g_eSettings[LEVELUP_SOUND][0])
+			{
 				emit_sound(id, CHAN_AUTO, g_eSettings[LEVELUP_SOUND], 1.0, ATTN_NORM, 0, PITCH_NORM)
+			}
 			else if(!bLevelUp && g_eSettings[LEVELDN_SOUND][0])
+			{
 				emit_sound(id, CHAN_AUTO, g_eSettings[LEVELDN_SOUND], 1.0, ATTN_NORM, 0, PITCH_NORM)
+			}
 				
 			if(g_eSettings[bLevelUp ? LEVELUP_SCREEN_FADE_ENABLED : LEVELDN_SCREEN_FADE_ENABLED])
 			{
@@ -1024,43 +1176,47 @@ check_level(const id, const bool:bNotify)
 public update_vip_status(id)
 {
 	if(is_user_connected(id) && g_eSettings[VIP_FLAGS_BIT] != ADMIN_ALL)
+	{
 		g_ePlayerData[id][IsVIP] = bool:((get_user_flags(id) & g_eSettings[VIP_FLAGS_BIT]) == g_eSettings[VIP_FLAGS_BIT])
+	}
 }
 
 public plugin_natives()
 {
 	register_library("crxranks")
-	register_native("crxranks_get_chat_prefix", 		"_crxranks_get_chat_prefix")
-	register_native("crxranks_get_final_flags", 		"_crxranks_get_final_flags")
-	register_native("crxranks_get_hudinfo_format", 		"_crxranks_get_hudinfo_format")
-	register_native("crxranks_get_max_levels", 			"_crxranks_get_max_levels")
-	register_native("crxranks_get_rank_by_level", 		"_crxranks_get_rank_by_level")
-	register_native("crxranks_get_save_type", 			"_crxranks_get_save_type")
-	register_native("crxranks_get_user_hudinfo", 		"_crxranks_get_user_hudinfo")
-	register_native("crxranks_get_user_level", 			"_crxranks_get_user_level")
-	register_native("crxranks_get_user_next_rank", 		"_crxranks_get_user_next_rank")
-	register_native("crxranks_get_user_next_xp", 		"_crxranks_get_user_next_xp")
-	register_native("crxranks_get_user_rank", 			"_crxranks_get_user_rank")
-	register_native("crxranks_get_user_xp", 			"_crxranks_get_user_xp")
-	register_native("crxranks_get_vault_name", 			"_crxranks_get_vault_name")
-	register_native("crxranks_get_vip_flags", 			"_crxranks_get_vip_flags")
-	register_native("crxranks_get_xp_for_level", 		"_crxranks_get_xp_for_level")
-	register_native("crxranks_get_xp_reward", 			"_crxranks_get_xp_reward")
-	register_native("crxranks_give_user_xp",	 		"_crxranks_give_user_xp")
-	register_native("crxranks_hi_is_using_dhud",		"_crxranks_hi_is_using_dhud")
-	register_native("crxranks_is_hud_enabled", 			"_crxranks_is_hud_enabled")
-	register_native("crxranks_is_sfdn_enabled", 		"_crxranks_is_sfdn_enabled")
-	register_native("crxranks_is_sfup_enabled", 		"_crxranks_is_sfup_enabled")
-	register_native("crxranks_is_user_on_final", 		"_crxranks_is_user_on_final")
-	register_native("crxranks_is_user_vip",				"_crxranks_is_user_vip")
-	register_native("crxranks_is_xpn_enabled", 			"_crxranks_is_xpn_enabled")
-	register_native("crxranks_set_user_xp", 			"_crxranks_set_user_xp")
-	register_native("crxranks_using_comb_events",		"_crxranks_using_comb_events")
-	register_native("crxranks_xpn_is_using_dhud",		"_crxranks_xpn_is_using_dhud")
+	register_native("crxranks_get_chat_prefix",         "_crxranks_get_chat_prefix")
+	register_native("crxranks_get_final_flags",         "_crxranks_get_final_flags")
+	register_native("crxranks_get_hudinfo_format",      "_crxranks_get_hudinfo_format")
+	register_native("crxranks_get_max_levels",          "_crxranks_get_max_levels")
+	register_native("crxranks_get_rank_by_level",       "_crxranks_get_rank_by_level")
+	register_native("crxranks_get_save_type",           "_crxranks_get_save_type")
+	register_native("crxranks_get_user_hudinfo",        "_crxranks_get_user_hudinfo")
+	register_native("crxranks_get_user_level",          "_crxranks_get_user_level")
+	register_native("crxranks_get_user_next_rank",      "_crxranks_get_user_next_rank")
+	register_native("crxranks_get_user_next_xp",        "_crxranks_get_user_next_xp")
+	register_native("crxranks_get_user_rank",           "_crxranks_get_user_rank")
+	register_native("crxranks_get_user_xp",             "_crxranks_get_user_xp")
+	register_native("crxranks_get_vault_name",          "_crxranks_get_vault_name")
+	register_native("crxranks_get_vip_flags",           "_crxranks_get_vip_flags")
+	register_native("crxranks_get_xp_for_level",        "_crxranks_get_xp_for_level")
+	register_native("crxranks_get_xp_reward",           "_crxranks_get_xp_reward")
+	register_native("crxranks_give_user_xp",            "_crxranks_give_user_xp")
+	register_native("crxranks_is_hi_using_dhud",        "_crxranks_is_hi_using_dhud")
+	register_native("crxranks_is_hud_enabled",          "_crxranks_is_hud_enabled")
+	register_native("crxranks_is_sfdn_enabled",         "_crxranks_is_sfdn_enabled")
+	register_native("crxranks_is_sfup_enabled",         "_crxranks_is_sfup_enabled")
+	register_native("crxranks_is_user_on_final",        "_crxranks_is_user_on_final")
+	register_native("crxranks_is_user_vip",             "_crxranks_is_user_vip")
+	register_native("crxranks_is_xpn_enabled",          "_crxranks_is_xpn_enabled")
+	register_native("crxranks_is_xpn_using_dhud",       "_crxranks_is_xpn_using_dhud")
+	register_native("crxranks_set_user_xp",             "_crxranks_set_user_xp")
+	register_native("crxranks_using_comb_events",       "_crxranks_using_comb_events")
 }
 
 public _crxranks_get_chat_prefix(iPlugin, iParams)
+{
 	set_string(1, CC_PREFIX, get_param(2))
+}
 
 public _crxranks_get_final_flags(iPlugin, iParams)
 {
@@ -1069,10 +1225,14 @@ public _crxranks_get_final_flags(iPlugin, iParams)
 }
 
 public _crxranks_get_hudinfo_format(iPlugin, iParams)
+{
 	set_string(2, g_eSettings[get_param(1) ? HUDINFO_FORMAT_FINAL : HUDINFO_FORMAT], get_param(3))
+}
 	
 public _crxranks_get_max_levels(iPlugin, iParams)
+{
 	return g_iMaxLevels
+}
 	
 public _crxranks_get_rank_by_level(iPlugin, iParams)
 {
@@ -1080,37 +1240,55 @@ public _crxranks_get_rank_by_level(iPlugin, iParams)
 	iLevel = get_param(1)
 	
 	if(iLevel < 1 || iLevel > g_iMaxLevels)
+	{
 		return 0
+	}
 		
-	static szRank[MAX_RANK_LENGTH]
+	static szRank[CRXRANKS_MAX_RANK_LENGTH]
 	ArrayGetString(g_aRankNames, iLevel, szRank, charsmax(szRank))
 	set_string(2, szRank, get_param(3))
 	return 1
 }
 
 public _crxranks_get_save_type(iPlugin, iParams)
+{
 	return g_eSettings[SAVE_TYPE]
+}
 
 public _crxranks_get_user_hudinfo(iPlugin, iParams)
+{
 	set_string(2, g_ePlayerData[get_param(1)][HUDInfo], get_param(3))
+}
 	
 public _crxranks_get_user_level(iPlugin, iParams)
+{
 	return g_ePlayerData[get_param(1)][Level]
+}
 	
 public _crxranks_get_user_next_rank(iPlugin, iParams)
+{
 	set_string(2, g_ePlayerData[get_param(1)][NextRank], get_param(3))
+}
 	
 public _crxranks_get_user_next_xp(iPlugin, iParams)
+{
 	return g_ePlayerData[get_param(1)][NextXP]	
+}
 	
 public _crxranks_get_user_rank(iPlugin, iParams)
+{
 	set_string(2, g_ePlayerData[get_param(1)][Rank], get_param(3))
+}
 	
 public _crxranks_get_user_xp(iPlugin, iParams)
+{
 	return g_ePlayerData[get_param(1)][XP]
+}
 	
 public _crxranks_get_vault_name(iPlugin, iParams)
+{
 	set_string(1, g_eSettings[VAULT_NAME], get_param(2))
+}
 	
 public _crxranks_get_vip_flags(iPlugin, iParams)
 {
@@ -1124,31 +1302,36 @@ public _crxranks_get_xp_for_level(iPlugin, iParams)
 	iLevel = get_param(1)
 	
 	if(iLevel < 1 || iLevel > g_iMaxLevels)
+	{
 		return -1
+	}
 		
 	return ArrayGetCell(g_aLevels, iLevel)
 }
 
 public _crxranks_get_xp_reward(iPlugin, iParams)
 {
-	static szReward[MAX_XP_REWARD_LENGTH]
+	static szReward[CRXRANKS_MAX_XP_REWARD_LENGTH]
 	get_string(2, szReward, charsmax(szReward))
 	return get_xp_reward(get_param(1), szReward)
 }
 	
 public _crxranks_give_user_xp(iPlugin, iParams)
 {
-	static szReward[MAX_XP_REWARD_LENGTH], iReward, id
-	szReward[0] = EOS
-	get_string(3, szReward, charsmax(szReward))
+	static szReward[CRXRANKS_MAX_XP_REWARD_LENGTH], iReward, id
+
+	szReward[0] = EOS	
 	id = get_param(1)
+	get_string(3, szReward, charsmax(szReward))
 	
 	if(szReward[0])
 	{
 		iReward = get_xp_reward(id, szReward)
 		
 		if(iReward)
+		{
 			give_user_xp(id, iReward, CRXRanks_XPSources:get_param(3))
+		}
 			
 		return iReward
 	}
@@ -1158,26 +1341,40 @@ public _crxranks_give_user_xp(iPlugin, iParams)
 	return iReward
 }
 
-public bool:_crxranks_hi_is_using_dhud(iPlugin, iParams)
+public bool:_crxranks_is_hi_using_dhud(iPlugin, iParams)
+{
 	return g_eSettings[HUDINFO_USE_DHUD]
+}
 
 public bool:_crxranks_is_hud_enabled(iPlugin, iParams)
+{
 	return g_eSettings[HUDINFO_ENABLED]
+}
 	
 public bool:_crxranks_is_sfdn_enabled(iPlugin, iParams)
+{
 	return g_eSettings[LEVELDN_SCREEN_FADE_ENABLED]
+}
 
 public bool:_crxranks_is_sfup_enabled(iPlugin, iParams)
+{
 	return g_eSettings[LEVELUP_SCREEN_FADE_ENABLED]
+}
 
 public bool:_crxranks_is_user_on_final(iPlugin, iParams)
+{
 	return g_ePlayerData[get_param(1)][IsOnFinalLevel]
+}
 	
 public bool:_crxranks_is_user_vip(iPlugin, iParams)
+{
 	return g_ePlayerData[get_param(1)][IsVIP]
+}
 	
 public bool:_crxranks_is_xpn_enabled(iPlugin, iParams)
+{
 	return g_eSettings[XP_NOTIFIER_ENABLED]
+}
 
 public bool:_crxranks_set_user_xp(iPlugin, iParams)
 {
@@ -1191,7 +1388,11 @@ public bool:_crxranks_set_user_xp(iPlugin, iParams)
 }
 	
 public bool:_crxranks_using_comb_events(iPlugin, iParams)
+{
 	return g_eSettings[USE_COMBINED_EVENTS]
+}
 	
-public bool:_crxranks_xpn_is_using_dhud(iPlugin, iParams)
+public bool:_crxranks_is_xpn_using_dhud(iPlugin, iParams)
+{
 	return g_eSettings[XP_NOTIFIER_USE_DHUD]
+}

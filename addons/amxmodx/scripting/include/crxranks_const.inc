@@ -11,6 +11,31 @@
 #define CRXRANKS_HANDLED 900301
 
 /**
+ * Maximum buffer length for HUD information
+ */
+const CRXRANKS_MAX_HUDINFO_LENGTH = 192
+
+/**
+ * Maximum buffer length for player information
+ */
+const CRXRANKS_MAX_PLAYER_INFO_LENGTH = 35
+
+/**
+ * Maximum buffer length for a rank
+ */
+const CRXRANKS_MAX_RANK_LENGTH = 32
+
+/**
+ * Maximum buffer length for a XP reward
+ */
+const CRXRANKS_MAX_XP_REWARD_LENGTH = 32
+
+/**
+ * Maximum buffer length for XP as a string
+ */
+const CRXRANKS_MAX_XP_LENGTH = 11
+
+/**
  * Save types for crxranks_get_save_type()
  */
 enum CRXRanks_SaveTypes
