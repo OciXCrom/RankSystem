@@ -19,11 +19,15 @@ new CC_PREFIX[64]
 
 #include <crxranks_const>
 
-#if defined client_disconnected
-	#define client_disconnect client_disconnected
+#if !defined client_disconnected
+	#define client_disconnected client_disconnect
 #endif
 
-new const PLUGIN_VERSION[] = "2.7"
+#if !defined replace_string
+	#define replace_string replace_all
+#endif
+
+new const PLUGIN_VERSION[] = "2.7.1"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -225,7 +229,8 @@ ReadFile()
 	
 	if(iFilePointer)
 	{
-		new szData[192], szValue[96], szMap[32], szKey[32], szTemp[4][5], bool:bRead = true, i, iSize, iSection = SECTION_NONE
+		new szData[CRXRANKS_MAX_HUDINFO_LENGTH + MAX_NAME_LENGTH], szValue[CRXRANKS_MAX_HUDINFO_LENGTH], szMap[MAX_NAME_LENGTH], szKey[MAX_NAME_LENGTH]
+		new szTemp[4][5], bool:bRead = true, i, iSize, iSection = SECTION_NONE
 		get_mapname(szMap, charsmax(szMap))
 		
 		while(!feof(iFilePointer))
@@ -545,7 +550,7 @@ public client_connect(id)
 	}
 }
 
-public client_disconnect(id)
+public client_disconnected(id)
 {
 	new szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
@@ -1033,53 +1038,53 @@ update_hudinfo(const id)
 	{
 		return
 	}
-		
+
 	static szMessage[CRXRANKS_MAX_HUDINFO_LENGTH], szPlaceHolder[32], bool:bIsOnFinal
+
 	bIsOnFinal = g_ePlayerData[id][IsOnFinalLevel]
 	copy(szMessage, charsmax(szMessage), g_eSettings[bIsOnFinal ? HUDINFO_FORMAT_FINAL : HUDINFO_FORMAT])
 	
 	if(has_argument(szMessage, ARG_CURRENT_XP))
 	{
 		num_to_str(g_ePlayerData[id][XP], szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_CURRENT_XP, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_CURRENT_XP, szPlaceHolder)
 	}
 	
 	if(has_argument(szMessage, ARG_NEXT_XP))
 	{
 		num_to_str(g_ePlayerData[id][NextXP], szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_NEXT_XP, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_NEXT_XP, szPlaceHolder)
 	}
 	
 	if(has_argument(szMessage, ARG_XP_NEEDED))
 	{
 		num_to_str(g_ePlayerData[id][NextXP] - g_ePlayerData[id][XP], szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_XP_NEEDED, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_XP_NEEDED, szPlaceHolder)
 	}
 	
 	if(has_argument(szMessage, ARG_LEVEL))
 	{
 		num_to_str(g_ePlayerData[id][Level], szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_LEVEL, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_LEVEL, szPlaceHolder)
 	}
 	
 	if(has_argument(szMessage, ARG_NEXT_LEVEL))
 	{
 		num_to_str(g_ePlayerData[id][bIsOnFinal ? Level : Level + 1], szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_NEXT_LEVEL, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_NEXT_LEVEL, szPlaceHolder)
 	}
 	
-	replace_all(szMessage, charsmax(szMessage), ARG_MAX_LEVELS, g_szMaxLevels)
+	replace_string(szMessage, charsmax(szMessage), ARG_MAX_LEVELS, g_szMaxLevels)
 
 	if(has_argument(szMessage, ARG_NAME))
 	{
 		get_user_name(id, szPlaceHolder, charsmax(szPlaceHolder))
-		replace_all(szMessage, charsmax(szMessage), ARG_NAME, szPlaceHolder)
+		replace_string(szMessage, charsmax(szMessage), ARG_NAME, szPlaceHolder)
 	}
 	
-	replace_all(szMessage, charsmax(szMessage), ARG_RANK, g_ePlayerData[id][Rank])
-	replace_all(szMessage, charsmax(szMessage), ARG_NEXT_RANK, g_ePlayerData[id][NextRank])
-	replace_all(szMessage, charsmax(szMessage), ARG_LINE_BREAK, "^n")
-	
+	replace_string(szMessage, charsmax(szMessage), ARG_RANK, g_ePlayerData[id][Rank])
+	replace_string(szMessage, charsmax(szMessage), ARG_NEXT_RANK, g_ePlayerData[id][NextRank])
+	replace_string(szMessage, charsmax(szMessage), ARG_LINE_BREAK, "^n")
 	copy(g_ePlayerData[id][HUDInfo], charsmax(g_ePlayerData[][HUDInfo]), szMessage)
 }
 
