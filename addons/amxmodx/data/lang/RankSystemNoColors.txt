@@ -152,3 +152,16 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yСистема званий: \rСписок
 CRXRANKS_ITEM_FORMAT = \d[%i опыт] \w%s \r[\yУровень %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i опыта
 CRXRANKS_XP_NOTIFIER_LOSE = -%i опыта
+
+[lt] -- Adomaz1
+CRXRANKS_RANKINFO_NORMAL = Turite %i/%i patirties taškų. Jūsų rangas: #%i: %s. Kitas rangas: %s.
+CRXRANKS_RANKINFO_FINAL = Turite %i patirties taškų. Jūsų rangas: #%i: %s. Pasiekėte paskutinįjį rangą!
+CRXRANKS_GIVE_XP = %s davė %i patirties taškus(-ų)  %s
+CRXRANKS_TAKE_XP = %s pasiėmė %i patirties taškus(-ų) iš %s
+CRXRANKS_RESET_XP = %s anuliavo %s patirties taškus
+CRXRANKS_LEVEL_REACHED = %s pasiekė %i-ąjį lygį [%s]
+CRXRANKS_LEVEL_LOST = %s grįžo į %i-ąjį lygį [%s]
+CRXRANKS_MENU_TITLE = \rOciXCromo \yRangų sistema: \rPatirties taškų sąrašas
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLygis %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
