@@ -165,3 +165,16 @@ CRXRANKS_MENU_TITLE = \rOciXCromo \yRangų sistema: \rPatirties taškų sąraša
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLygis %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[sr] -- ^G[L]A^~Yuki
+CRXRANKS_RANKINFO_NORMAL = Imate &x04%i/%i XP-a&x01. Vas rank je &x04#%i&x01: &x03%s&x01. Sledeci rank: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Imate &x04%i XP-a&x01. Vas rank je &x04#%i&x01: &x03%s&x01. Vi ste na poslednjem nivou!
+CRXRANKS_GIVE_XP = &x03%s &x01je dao &x04%i XP-a &x01igracu &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01je oduzeo &x04%i XP-a &x01igracu &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01je resetovao &x03%s&x01 XP
+CRXRANKS_LEVEL_REACHED = &x03%s &x01je dostigao &x04Nivo %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01se vratio na &x04Nivo %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank Sistem: \rXP List
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
