@@ -114,15 +114,15 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\ySeviye %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 
-[de] -- Godofwar
-CRXRANKS_RANKINFO_NORMAL = Du hast &x04%i/%i XP&x01. Dein Rank ist &x04#%i&x01: &x03%s&x01. Naechster Rank: &x03%s&x01.
-CRXRANKS_RANKINFO_FINAL = Du hast &x04%i XP&x01. Dein Rank ist &x04#%i&x01: &x03%s&x01. Du bist auf dem letzten Level!
+[de] -- Godofwar, Mordekay
+CRXRANKS_RANKINFO_NORMAL = Du hast &x04%i/%i XP&x01. Dein Rang ist &x04#%i&x01: &x03%s&x01. Nächster Rang: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Du hast &x04%i XP&x01. Dein Rang ist &x04#%i&x01: &x03%s&x01. Du bist auf dem letzten Level!
 CRXRANKS_GIVE_XP = &x03%s &x01gab &x04%i XP &x01an &x03%s
 CRXRANKS_TAKE_XP = &x03%s &x01nahm &x04%i XP &x01von &x03%s
-CRXRANKS_RESET_XP = &x03%s &x01hat die XP von &x03%s&x01 zurueckgesetzt
+CRXRANKS_RESET_XP = &x03%s &x01hat die XP von &x03%s&x01 zurückgesetzt
 CRXRANKS_LEVEL_REACHED = &x03%s &x01erreichte &x04Level %i &x01[&x03%s&x01]
-CRXRANKS_LEVEL_LOST = &x03%s &x01ist zurueckgegangen auf &x04Level %i &x01[&x03%s&x01]
-CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rXP Liste
+CRXRANKS_LEVEL_LOST = &x03%s &x01ist zurückgegangen auf &x04Level %i &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang System: \rXP Liste
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
