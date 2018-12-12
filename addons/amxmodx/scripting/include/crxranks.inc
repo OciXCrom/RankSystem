@@ -245,6 +245,13 @@ native bool:crxranks_is_user_on_final(id)
 native bool:crxranks_is_user_vip(id)
 
 /** 
+ * Checks if the plugin is using MySQL to save/load XP.
+ * 
+ * @return				True if it is, false otherwise.
+ */
+native bool:crxranks_is_using_mysql()
+
+/** 
  * Checks if the XP notifier system is enabled.
  * 
  * @return				True if it is, false otherwise.

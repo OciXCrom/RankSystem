@@ -2,6 +2,7 @@
 #include <amxmisc>
 #include <fakemeta>
 #include <nvault>
+#include <sqlx>
 
 // Comment or remove this line in order to run the plugin on a mod different than Counter-Strike.
 #define USE_CSTRIKE
@@ -27,10 +28,12 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "2.7.1"
+new const PLUGIN_VERSION[] = "3.0"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
+const MAX_SQL_LENGTH = 512
+const MAX_QUERY_LENGTH = 128
 const MAX_SOUND_LENGTH = 128
 const TASK_HUD = 304500
 
@@ -71,28 +74,34 @@ g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .hol
 #define XP_NOTIFIER_PARAMS_LOSE clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][0]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][1]), clr(g_eSettings[XP_NOTIFIER_COLOR_LOSE][2]),\
 g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .holdtime = g_eSettings[XP_NOTIFIER_DURATION]
 
-enum _:Vault
+enum _:SaveLoad
 {
-	VAULT_WRITE = 0,
-	VAULT_READ
+	SL_SAVE_DATA,
+	SL_LOAD_DATA
 }
 
 enum _:Objects
 {
-	OBJ_HUDINFO = 0,
+	OBJ_HUDINFO,
 	OBJ_XP_NOTIFIER
 }
 
 enum _:SaveTypes
 {
-	SAVE_NICKNAME = 0,
+	SAVE_NICKNAME,
 	SAVE_IP,
 	SAVE_STEAMID
 }
 
+enum _:SaveMethods
+{
+	SAVE_NVAULT,
+	SAVE_MYSQL
+}
+
 enum _:Sections
 {
-	SECTION_NONE = 0,
+	SECTION_NONE,
 	SECTION_SETTINGS,
 	SECTION_RANKS,
 	SECTION_XP_REWARDS
@@ -114,6 +123,12 @@ enum _:PlayerData
 enum _:Settings
 {
 	SAVE_TYPE,
+	bool:USE_MYSQL,
+	SQL_HOST[MAX_NAME_LENGTH],
+	SQL_USER[MAX_NAME_LENGTH],
+	SQL_PASSWORD[MAX_NAME_LENGTH],
+	SQL_DATABASE[MAX_NAME_LENGTH],
+	SQL_TABLE[MAX_NAME_LENGTH],
 	LEVELUP_MESSAGE_TYPE,
 	LEVELUP_SOUND[MAX_SOUND_LENGTH],
 	bool:LEVELUP_SCREEN_FADE_ENABLED,
@@ -152,6 +167,8 @@ enum _:Settings
 new g_eSettings[Settings]
 new g_ePlayerData[33][PlayerData]
 new g_szMaxLevels[CRXRANKS_MAX_XP_LENGTH]
+new g_szSqlError[MAX_SQL_LENGTH]
+new Handle:g_iSqlTuple
 new Array:g_aLevels
 new Array:g_aRankNames
 new Trie:g_tXPRewards
@@ -193,6 +210,42 @@ public plugin_init()
 	g_fwdUserLevelUpdated = CreateMultiForward("crxranks_user_level_updated", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
 	g_fwdUserReceiveXP    = CreateMultiForward("crxranks_user_receive_xp",    ET_STOP,   FP_CELL, FP_CELL, FP_CELL)
 	g_fwdUserXPUpdated    = CreateMultiForward("crxranks_user_xp_updated",    ET_IGNORE, FP_CELL, FP_CELL, FP_CELL)
+
+	if(g_eSettings[USE_MYSQL])
+	{
+		g_iSqlTuple = SQL_MakeDbTuple(g_eSettings[SQL_HOST], g_eSettings[SQL_USER], g_eSettings[SQL_PASSWORD], g_eSettings[SQL_DATABASE])
+
+		new iErrorCode, Handle:iSqlConnection = SQL_Connect(g_iSqlTuple, iErrorCode, g_szSqlError, charsmax(g_szSqlError))
+
+		if(iSqlConnection == Empty_Handle)
+		{
+			log_amx(g_szSqlError)
+			switch_to_nvault()
+			goto @AFTER_MYSQL
+		}
+
+		new Handle:iQueries = SQL_PrepareQuery(iSqlConnection,\
+		"CREATE TABLE IF NOT EXISTS `%s` (`User` VARCHAR(%i) NOT NULL, `XP` INT(%i) NOT NULL, PRIMARY KEY(User));",\
+		g_eSettings[SQL_TABLE], CRXRANKS_MAX_PLAYER_INFO_LENGTH, CRXRANKS_MAX_XP_LENGTH)
+
+		if(!SQL_Execute(iQueries))
+		{
+			SQL_QueryError(iQueries, g_szSqlError, charsmax(g_szSqlError))
+			log_amx(g_szSqlError)
+			switch_to_nvault()
+			goto @AFTER_MYSQL
+		}
+
+		SQL_FreeHandle(iQueries)
+		SQL_FreeHandle(iSqlConnection)
+	}
+
+	@AFTER_MYSQL:
+
+	if(!g_eSettings[USE_MYSQL])
+	{
+		g_iVault = nvault_open(g_eSettings[VAULT_NAME])
+	}
 }
 
 public plugin_precache()
@@ -216,7 +269,11 @@ public plugin_end()
 	TrieDestroy(g_tXPRewards)
 	TrieDestroy(g_tXPRewardsVIP)
 	DestroyForward(g_fwdUserLevelUpdated)
-	nvault_close(g_iVault)
+
+	if(!g_eSettings[USE_MYSQL])
+	{
+		nvault_close(g_iVault)
+	}
 }
 
 ReadFile()
@@ -312,6 +369,30 @@ ReadFile()
 							{
 								g_eSettings[SAVE_TYPE] = clamp(str_to_num(szValue), SAVE_NICKNAME, SAVE_STEAMID)
 							}
+							else if(equal(szKey, "USE_MYSQL"))
+							{
+								g_eSettings[USE_MYSQL] = _:clamp(str_to_num(szValue), false, true)
+							}
+							else if(equal(szKey, "SQL_HOST"))
+							{
+								copy(g_eSettings[SQL_HOST], charsmax(g_eSettings[SQL_HOST]), szValue)
+							}
+							else if(equal(szKey, "SQL_USER"))
+							{
+								copy(g_eSettings[SQL_USER], charsmax(g_eSettings[SQL_USER]), szValue)
+							}
+							else if(equal(szKey, "SQL_PASSWORD"))
+							{
+								copy(g_eSettings[SQL_PASSWORD], charsmax(g_eSettings[SQL_PASSWORD]), szValue)
+							}
+							else if(equal(szKey, "SQL_DATABASE"))
+							{
+								copy(g_eSettings[SQL_DATABASE], charsmax(g_eSettings[SQL_DATABASE]), szValue)
+							}
+							else if(equal(szKey, "SQL_TABLE"))
+							{
+								copy(g_eSettings[SQL_TABLE], charsmax(g_eSettings[SQL_TABLE]), szValue)
+							}
 							else if(equal(szKey, "XP_COMMANDS"))
 							{
 								while(szValue[0] != 0 && strtok(szValue, szKey, charsmax(szKey), szValue, charsmax(szValue), ','))
@@ -381,7 +462,6 @@ ReadFile()
 							}
 							else if(equal(szKey, "VAULT_NAME"))
 							{
-								g_iVault = nvault_open(szValue)
 								copy(g_eSettings[VAULT_NAME], charsmax(g_eSettings[VAULT_NAME]), szValue)
 							}
 							else if(equal(szKey, "TEAM_LOCK"))
@@ -539,7 +619,7 @@ public client_connect(id)
 	
 	new szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
-	use_vault(id, szInfo, VAULT_READ)
+	save_or_load(id, szInfo, SL_LOAD_DATA)
 
 	g_ePlayerData[id][IsBot] = is_user_bot(id) != 0
 	set_task(DELAY_ON_CONNECT, "update_vip_status", id)
@@ -554,7 +634,7 @@ public client_disconnected(id)
 {
 	new szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
 	get_user_saveinfo(id, szInfo, charsmax(szInfo))
-	use_vault(id, szInfo, VAULT_WRITE)
+	save_or_load(id, szInfo, SL_SAVE_DATA)
 	remove_task(id + TASK_HUD)
 }
 
@@ -574,13 +654,30 @@ public client_infochanged(id)
 	{		
 		if(g_eSettings[SAVE_TYPE] == SAVE_NICKNAME)
 		{
-			use_vault(id, szOldName, VAULT_WRITE)
-			use_vault(id, szNewName, VAULT_READ)
-			update_hudinfo(id)
+			save_or_load(id, szOldName, SL_SAVE_DATA)
+
+			if(g_eSettings[USE_MYSQL])
+			{
+				reset_player_stats(id)
+				set_task(DELAY_ON_CHANGE, "load_after_change", id)
+			}
+			else
+			{
+				save_or_load(id, szNewName, SL_LOAD_DATA)
+				update_hudinfo(id)
+			}			
 		}
 		
 		set_task(DELAY_ON_CHANGE, "update_vip_status", id)
 	}
+}
+
+public load_after_change(id)
+{
+	static szName[MAX_NAME_LENGTH]
+	get_user_name(id, szName, charsmax(szName))
+	save_or_load(id, szName, SL_LOAD_DATA)
+	update_hudinfo(id)
 }
 
 public DisplayHUD(id)
@@ -845,29 +942,119 @@ public sort_players_by_xp(id1, id2)
 	return 0
 }
 
-use_vault(const id, const szInfo[], const iType)
+public QueryHandler(iFailState, Handle:iQuery, szError[], iErrorCode)
+{
+	switch(iFailState)
+	{
+		case TQUERY_CONNECT_FAILED: log_amx("[SQL Error] Connection failed (%i): %s", iErrorCode, szError)
+		case TQUERY_QUERY_FAILED:   log_amx("[SQL Error] Query failed (%i): %s", iErrorCode, szError)
+	}
+}
+
+save_or_load(const id, const szInfo[], const iType)
 {
 	if(!szInfo[0])
 	{
 		return
 	}
-		
+
 	switch(iType)
 	{
-		case VAULT_WRITE:
+		case SL_SAVE_DATA:
 		{
-			static szData[CRXRANKS_MAX_XP_LENGTH]
-			num_to_str(g_ePlayerData[id][XP], szData, charsmax(szData))
-			nvault_set(g_iVault, szInfo, szData)
+			if(g_eSettings[USE_MYSQL])
+			{
+				static szQuery[MAX_QUERY_LENGTH]
+				formatex(szQuery, charsmax(szQuery), "UPDATE `%s` SET `XP`='%i' WHERE `User`='%s';", g_eSettings[SQL_TABLE], g_ePlayerData[id][XP], szInfo)
+				SQL_ThreadQuery(g_iSqlTuple, "QueryHandler", szQuery)
+			}
+			else
+			{
+				static szData[CRXRANKS_MAX_XP_LENGTH]
+				num_to_str(g_ePlayerData[id][XP], szData, charsmax(szData))
+				nvault_set(g_iVault, szInfo, szData)
+			}
 		}
-		case VAULT_READ:
+		case SL_LOAD_DATA:
 		{
-			static iData
-			iData = nvault_get(g_iVault, szInfo)
-			g_ePlayerData[id][XP] = iData ? clamp(iData, 0) : 0
-			check_level(id, false)
+			if(g_eSettings[USE_MYSQL])
+			{
+				static szUser[CRXRANKS_MAX_PLAYER_INFO_LENGTH]
+				new iErrorCode, Handle:iSqlConnection = SQL_Connect(g_iSqlTuple, iErrorCode, g_szSqlError, charsmax(g_szSqlError))
+				SQL_QuoteString(iSqlConnection, szUser, charsmax(szUser), szInfo)
+
+				if(iSqlConnection == Empty_Handle)
+				{
+					log_amx(g_szSqlError)
+					return
+				}
+
+				new Handle:iQuery = SQL_PrepareQuery(iSqlConnection, "SELECT * FROM %s WHERE User = '%s';", g_eSettings[SQL_TABLE], szUser)
+
+				if(!SQL_Execute(iQuery))
+				{
+					SQL_QueryError(iQuery, g_szSqlError, charsmax(g_szSqlError))
+					log_amx(g_szSqlError)
+					return
+				}
+
+				prepare_player(id, szUser, SQL_NumResults(iQuery) > 0 ? false : true)
+				SQL_FreeHandle(iQuery)
+				SQL_FreeHandle(iSqlConnection)
+			}
+			else
+			{
+				static iData
+				iData = nvault_get(g_iVault, szInfo)
+				g_ePlayerData[id][XP] = iData ? clamp(iData, 0) : 0
+				check_level(id, false)
+			}
 		}
 	}
+}
+
+prepare_player(id, const szInfo[], bool:bNewPlayer)
+{
+	new szUser[CRXRANKS_MAX_PLAYER_INFO_LENGTH], iErrorCode, Handle:iSqlConnection = SQL_Connect(g_iSqlTuple, iErrorCode, g_szSqlError, charsmax(g_szSqlError))
+	SQL_QuoteString(iSqlConnection, szUser, charsmax(szUser), szInfo)
+
+	if(iSqlConnection == Empty_Handle)
+	{
+		log_amx(g_szSqlError)
+		return
+	}
+
+	static szQuery[MAX_QUERY_LENGTH]
+
+	if(bNewPlayer)
+	{
+		formatex(szQuery, charsmax(szQuery), "INSERT INTO %s (`User`,`XP`) VALUES ('%s','0');", g_eSettings[SQL_TABLE], szUser)
+	}
+	else
+	{
+		formatex(szQuery, charsmax(szQuery), "SELECT XP FROM %s WHERE User = '%s';", g_eSettings[SQL_TABLE], szUser)
+	}
+	
+	new Handle:iQuery = SQL_PrepareQuery(iSqlConnection, szQuery)
+
+	if(!SQL_Execute(iQuery))
+	{
+		SQL_QueryError(iQuery, g_szSqlError, charsmax(g_szSqlError))
+		log_amx(g_szSqlError)
+	}
+
+	if(!bNewPlayer)
+	{
+		if(SQL_NumResults(iQuery) > 0)
+		{
+			g_ePlayerData[id][XP] = SQL_ReadResult(iQuery, 0)
+		}
+	}
+
+	check_level(id, false)
+
+	SQL_FreeHandle(iQuery)
+	SQL_FreeHandle(iSqlConnection)
 }
 
 get_xp_reward(const id, const szKey[])
@@ -1004,6 +1191,15 @@ reset_player_stats(const id)
 	g_ePlayerData[id][IsBot] = false
 }
 
+switch_to_nvault()
+{
+	if(g_eSettings[USE_MYSQL])
+	{
+		g_eSettings[USE_MYSQL] = false
+		log_amx("%L", LANG_SERVER, "CRXRANKS_MYSQL_FAILED")
+	}
+}
+
 bool:has_argument(const szMessage[], const szArg[])
 {
 	return contain(szMessage, szArg) != -1
@@ -1122,7 +1318,7 @@ check_level(const id, const bool:bNotify)
 			
 			if(g_eSettings[FINAL_LEVEL_FLAGS])
 			{
-				set_user_flags(id, g_eSettings[FINAL_LEVEL_FLAGS])
+				set_user_flags(id, g_eSettings[FINAL_LEVEL_FLAGS_BIT])
 				remove_user_flags(id, g_iFlagZ)
 			}
 		}
@@ -1212,6 +1408,7 @@ public plugin_natives()
 	register_native("crxranks_is_sfup_enabled",         "_crxranks_is_sfup_enabled")
 	register_native("crxranks_is_user_on_final",        "_crxranks_is_user_on_final")
 	register_native("crxranks_is_user_vip",             "_crxranks_is_user_vip")
+	register_native("crxranks_is_using_mysql",          "_crxranks_is_using_mysql")
 	register_native("crxranks_is_xpn_enabled",          "_crxranks_is_xpn_enabled")
 	register_native("crxranks_is_xpn_using_dhud",       "_crxranks_is_xpn_using_dhud")
 	register_native("crxranks_set_user_xp",             "_crxranks_set_user_xp")
@@ -1374,6 +1571,11 @@ public bool:_crxranks_is_user_on_final(iPlugin, iParams)
 public bool:_crxranks_is_user_vip(iPlugin, iParams)
 {
 	return g_ePlayerData[get_param(1)][IsVIP]
+}
+
+public bool:_crxranks_is_using_mysql(iPlugin, iParams)
+{
+	return g_eSettings[USE_MYSQL]
 }
 	
 public bool:_crxranks_is_xpn_enabled(iPlugin, iParams)

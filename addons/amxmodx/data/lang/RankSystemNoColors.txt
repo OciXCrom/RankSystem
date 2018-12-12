@@ -13,6 +13,7 @@ CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = You received %i XP for killing %s
 CRXRANKS_NOTIFY_KILL_LOSE = You lost %i XP for killing %s
 CRXRANKS_NOTIFY_SUICIDE = You lost %i XP for committing suicide.
+CRXRANKS_MYSQL_FAILED = MySQL connection failed. The plugin will use nVault instead.
 
 [mk] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvojot rank e #%i: %s. Sleden rank: %s.
@@ -29,6 +30,7 @@ CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Dobi %i XP za ubistvoto na %s
 CRXRANKS_NOTIFY_KILL_LOSE = Izgubi %i XP za ubistvoto na %s
 CRXRANKS_NOTIFY_SUICIDE = Izgubi %i XP zatoa shto izvrshi samoubistvo.
+CRXRANKS_MYSQL_FAILED = Neuspeshno povrzuvanje so MySQL. Pluginot kje koristi nVault.
 
 [bg] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvoqt rank e #%i: %s. Sledvasht rank: %s.
@@ -45,6 +47,7 @@ CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Poluchi %i XP za ubiistvoto na %s
 CRXRANKS_NOTIFY_KILL_LOSE = Izgubi %i XP za ubiistvoto na %s
 CRXRANKS_NOTIFY_SUICIDE = Izgubi %i XP zashtoto izvurshi samoubiistvo.
+CRXRANKS_MYSQL_FAILED = Neuspeshno svurzvane s MySQL. Pluginut shte polzva nVault.
 
 [bp] -- tarsisd2
 CRXRANKS_RANKINFO_NORMAL = Voce tem %i/%i XP. Seu rank #%i: %s. Proximo rank: %s.
