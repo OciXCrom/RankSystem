@@ -78,7 +78,7 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 
-[es] -- Rivotril
+[es] -- Rivotril, teol
 CRXRANKS_RANKINFO_NORMAL = Tienes %i/%i EXP. Tu rango es #%i: %s. Sig. Rango: %s.
 CRXRANKS_RANKINFO_FINAL = Tienes %i XP. Tu rango es #%i: %s. Ahora estas en el ultimo nivel!
 CRXRANKS_GIVE_XP = %s le dio %i EXP a %s
@@ -90,6 +90,7 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \ySistema de Rangos: \rLista de EXP
 CRXRANKS_ITEM_FORMAT = \d[%i EXP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i EXP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i EXP
+CRXRANKS_MYSQL_FAILED = La conexion MySQL ha fallado. El plugin usara nVault en su lugar.
 
 [sk] -- Belo95135
 CRXRANKS_RANKINFO_NORMAL = Mas %i/%i XP. Tvoja priecka je #%i: %s. Najblizsi rank: %s.
@@ -116,6 +117,7 @@ CRXRANKS_MENU_TITLE = \rOciXCrom'un \yRutbe Sistemi: \rXP Listesi
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\ySeviye %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_MYSQL_FAILED = MySQL baglantisi basarisiz oldu. Eklenti onun yerine nVault kullanacak.
 
 [de] -- Godofwar, Mordekay
 CRXRANKS_RANKINFO_NORMAL = Du hast %i/%i XP. Dein Rang ist #%i: %s. Nächster Rang: %s.
@@ -129,6 +131,7 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang System: \rXP Liste
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_MYSQL_FAILED = MySQL Verbindung fehlgeschlagen. Das Plugin wird daher nVault nutzen.
 
 [nl] -- NapoleoN#
 CRXRANKS_RANKINFO_NORMAL = Je hebt %i/%i XP. Uw rang is #%i: %s. Volgend rang: %s.
@@ -181,3 +184,20 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank Sistem: \rXP List
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivo %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+
+[fr] -- teol
+CRXRANKS_RANKINFO_NORMAL = Vous avez %i/%i XP. Votre rang est #%i: %s. Prochain rang: %s.
+CRXRANKS_RANKINFO_FINAL = Vous avez %i XP. Votre rang est #%i: %s. Vous etes au dernier niveau!
+CRXRANKS_GIVE_XP = %s donne %i XP a %s
+CRXRANKS_TAKE_XP = %s prend %i XP a %s
+CRXRANKS_RESET_XP = %s remet a zero les XP de %s
+CRXRANKS_LEVEL_REACHED = %s a atteint le Niveau %i [%s]
+CRXRANKS_LEVEL_LOST = %s est revenu au Niveau %i [%s]
+CRXRANKS_MENU_TITLE = \rOciXCrom's \yRank System: \rListe d'XP
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNiveau %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Vous recevez %i XP en tuant %s
+CRXRANKS_NOTIFY_KILL_LOSE = Vous perdez %i XP en tuant %s
+CRXRANKS_NOTIFY_SUICIDE = Vous perdez %i XP en vous suicidant.
+CRXRANKS_MYSQL_FAILED = Echec de la connexion MySQL. Le plugin utilisera nVault en remplacement.
