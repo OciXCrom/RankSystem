@@ -49,7 +49,7 @@ CRXRANKS_NOTIFY_KILL_LOSE = Izgubi %i XP za ubiistvoto na %s
 CRXRANKS_NOTIFY_SUICIDE = Izgubi %i XP zashtoto izvurshi samoubiistvo.
 CRXRANKS_MYSQL_FAILED = Neuspeshno svurzvane s MySQL. Pluginut shte polzva nVault.
 
-[bp] -- tarsisd2
+[bp] -- tarsisd2, iceeedr
 CRXRANKS_RANKINFO_NORMAL = Voce tem %i/%i XP. Seu rank #%i: %s. Proximo rank: %s.
 CRXRANKS_RANKINFO_FINAL = Voce tem %i XP. Seu rank #%i: %s. Voce esta no ultimo level!
 CRXRANKS_GIVE_XP = %s perdeu %i XP para %s
@@ -64,6 +64,7 @@ CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Voce ganhou %i XP por matar %s
 CRXRANKS_NOTIFY_KILL_LOSE = Voce perdeu %i XP por matar %s
 CRXRANKS_NOTIFY_SUICIDE = Voce perdeu %i XP por suicidar.
+CRXRANKS_MYSQL_FAILED = A conexao MYSQL falhou. O plugin usara nVault.
 
 [ro] -- DevilBoy.eXe
 CRXRANKS_RANKINFO_NORMAL = Ai %i/%i XP. Rangul tau este #%i: %s. Urmatorul rang: %s.
