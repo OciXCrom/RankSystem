@@ -97,6 +97,16 @@ native crxranks_get_rank_by_level(level, buffer[], len)
 native CRXRanks_SaveTypes:crxranks_get_save_type()
 
 /** 
+ * Returns a key value set in the [Settings] section in the plugin's configuration file.
+ * 
+ * @param key	 		Key to search for.
+ * @param value 	 	Buffer to store the value in.
+ * @param len 			Maximum buffer length.
+ * @return				True if the key was found, false otherwise.
+ */
+native bool:crxranks_get_setting(key[], value[], len)
+
+/** 
  * Returns the client's HUD information.
  * 
  * @param id		 	Client index.
