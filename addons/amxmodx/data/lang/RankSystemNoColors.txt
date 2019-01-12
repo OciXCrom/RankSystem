@@ -149,7 +149,7 @@ CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 
 [ru] -- Dev-CS Team
 CRXRANKS_RANKINFO_NORMAL = У вас %i/%i опыта. Ваше звание #%i: %s. Следующее звание: %s.
-CRXRANKS_RANKINFO_FINAL = У вас %i опыта. Ваше звание #%i: %s. Вы достишли последнего звания!
+CRXRANKS_RANKINFO_FINAL = У вас %i опыта. Ваше звание #%i: %s. Вы достигли последнего звания!
 CRXRANKS_GIVE_XP = %s дал %i опыта игроку %s
 CRXRANKS_TAKE_XP = %s взял %i опыта у игрока %s
 CRXRANKS_RESET_XP = %s обнулил %s's опыт
