@@ -28,7 +28,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.2"
+new const PLUGIN_VERSION[] = "3.3"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -967,9 +967,34 @@ public QueryUpdateMySQL(iFailState, Handle:iQuery, szError[], iErrorCode)
 
 public OnPlayerKilled()
 {
-	new iAttacker = read_data(1), iVictim = read_data(2)
+	new szWeapon[16], iAttacker = read_data(1), iVictim = read_data(2), iXP
+	read_data(4, szWeapon, charsmax(szWeapon))
 
-	if(!is_user_connected(iAttacker) || !is_user_connected(iVictim))
+	if(!is_user_connected(iVictim))
+	{
+		return
+	}
+
+	if(iAttacker == iVictim || equal(szWeapon, "worldspawn") || equal(szWeapon, "door", 4) || equal(szWeapon, "trigger_hurt"))
+	{
+		iXP = get_xp_reward(iVictim, XPREWARD_SUICIDE)
+
+		if(g_eSettings[USE_COMBINED_EVENTS])
+		{
+			iXP += get_xp_reward(iVictim, XPREWARD_DEATH)
+		}
+
+		give_user_xp(iVictim, iXP, CRXRANKS_XPS_REWARD)
+
+		if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
+		{
+			CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
+		}
+
+		return
+	}
+
+	if(!is_user_connected(iAttacker))
 	{
 		return
 	}
@@ -998,9 +1023,6 @@ public OnPlayerKilled()
 	}
 	else
 	{
-		new szWeapon[16]
-		read_data(4, szWeapon, charsmax(szWeapon))
-
 		iTemp = get_xp_reward(iAttacker, szWeapon)
 		iReward += iTemp
 
@@ -1024,23 +1046,21 @@ public OnPlayerKilled()
 	}
 
 	@GIVE_REWARD:
-	new iXP = give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
+	iXP = give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
 
 	if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
 	{
-		if(iAttacker == iVictim)
-		{
-			CC_SendMessage(iAttacker, "%L", iAttacker, "CRXRANKS_NOTIFY_SUICIDE", abs(iXP))
-		}
-		else
-		{
-			new szName[MAX_NAME_LENGTH]
-			get_user_name(iVictim, szName, charsmax(szName))
-			CC_SendMessage(iAttacker, "%L", iAttacker, iXP >= 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
-		}
+		new szName[MAX_NAME_LENGTH]
+		get_user_name(iVictim, szName, charsmax(szName))
+		CC_SendMessage(iAttacker, "%L", iAttacker, iXP > 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
 	}
 
-	give_user_xp(iVictim, get_xp_reward(iVictim, XPREWARD_DEATH), CRXRANKS_XPS_REWARD)
+	iXP = give_user_xp(iVictim, get_xp_reward(iVictim, XPREWARD_DEATH), CRXRANKS_XPS_REWARD)
+
+	if(iXP != 0)
+	{
+		CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
+	}
 }
 
 public sort_players_by_xp(id1, id2)
@@ -1664,14 +1684,14 @@ public _crxranks_give_user_xp(iPlugin, iParams)
 
 		if(iReward)
 		{
-			give_user_xp(id, iReward, CRXRanks_XPSources:get_param(3))
+			give_user_xp(id, iReward, CRXRanks_XPSources:get_param(4))
 		}
 
 		return iReward
 	}
 
 	iReward = get_param(2)
-	give_user_xp(id, iReward, CRXRanks_XPSources:get_param(3))
+	give_user_xp(id, iReward, CRXRanks_XPSources:get_param(4))
 	return iReward
 }
 

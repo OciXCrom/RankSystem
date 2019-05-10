@@ -12,7 +12,10 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = You received &x04%i XP &x01for killing &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = You lost &x04%i XP &x01for killing &x03%s
-CRXRANKS_NOTIFY_SUICIDE = You lost &x04%i XP &x01for &x03committing suicide&x01.
+CRXRANKS_NOTIFY_SUICIDE_GET = You received &x04%i XP &x01for &x03committing suicide&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = You lost &x04%i XP &x01for &x03committing suicide&x01.
+CRXRANKS_NOTIFY_DEATH_GET = You received &x04%i XP &x01for dying.
+CRXRANKS_NOTIFY_DEATH_LOSE = You lost &x04%i XP &x01for dying.
 CRXRANKS_MYSQL_FAILED = MySQL connection failed. The plugin will use nVault instead.
 
 [mk] -- OciXCrom
@@ -29,7 +32,10 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Dobi &x04%i XP &x01za ubistvoto na &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Izgubi &x04%i XP &x01za ubistvoto na &x03%s
-CRXRANKS_NOTIFY_SUICIDE = Izgubi &x04%i XP &x01zatoa shto &x03izvrshi samoubistvo&x01.
+CRXRANKS_NOTIFY_SUICIDE_GET = Dobi &x04%i XP &x01zatoa shto &x03izvrshi samoubistvo&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi &x04%i XP &x01zatoa shto &x03izvrshi samoubistvo&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Dobi &x04%i XP &x01zatoa shto umre.
+CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi &x04%i XP &x01zatoa shto umre.
 CRXRANKS_MYSQL_FAILED = Neuspeshno povrzuvanje so MySQL. Pluginot kje koristi nVault.
 
 [bg] -- OciXCrom
@@ -46,7 +52,10 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Poluchi &x04%i XP &x01za ubiistvoto na &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Izgubi &x04%i XP &x01za ubiistvoto na &x03%s
-CRXRANKS_NOTIFY_SUICIDE = Izgubi &x04%i XP &x01zashtoto &x03izvurshi samoubiistvo&x01.
+CRXRANKS_NOTIFY_SUICIDE_GET = Poluchi &x04%i XP &x01zashtoto &x03izvurshi samoubiistvo&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi &x04%i XP &x01zashtoto &x03izvurshi samoubiistvo&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Poluchi &x04%i XP &x01zashtoto umrq.
+CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi &x04%i XP &x01zashtoto umrq.
 CRXRANKS_MYSQL_FAILED = Neuspeshno svurzvane s MySQL. Pluginut shte polzva nVault.
 
 [bp] -- tarsisd2, iceeedr
@@ -63,7 +72,7 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Voce ganhou &x04%i XP &x01por matar &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Voce perdeu &x04%i XP &x01por matar &x03%s
-CRXRANKS_NOTIFY_SUICIDE = Voce perdeu &x04%i XP &x01por &x03suicidar&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Voce perdeu &x04%i XP &x01por &x03suicidar&x01.
 CRXRANKS_MYSQL_FAILED = A conexao MYSQL falhou. O plugin usara nVault.
 
 [ro] -- DevilBoy.eXe
@@ -200,5 +209,5 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Vous recevez &x04%i XP &x01en tuant &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Vous perdez &x04%i XP &x01en tuant &x03%s
-CRXRANKS_NOTIFY_SUICIDE = Vous perdez &x04%i XP &x01en vous &x03suicidant&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Vous perdez &x04%i XP &x01en vous &x03suicidant&x01.
 CRXRANKS_MYSQL_FAILED = Echec de la connexion MySQL. Le plugin utilisera nVault en remplacement.
