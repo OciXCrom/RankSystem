@@ -986,7 +986,7 @@ public OnPlayerKilled()
 
 		give_user_xp(iVictim, iXP, CRXRANKS_XPS_REWARD)
 
-		if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
+		if(should_send_kill_message(iXP))
 		{
 			CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
 		}
@@ -1048,7 +1048,7 @@ public OnPlayerKilled()
 	@GIVE_REWARD:
 	iXP = give_user_xp(iAttacker, iReward, CRXRANKS_XPS_REWARD)
 
-	if(g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
+	if(should_send_kill_message(iXP))
 	{
 		new szName[MAX_NAME_LENGTH]
 		get_user_name(iVictim, szName, charsmax(szName))
@@ -1057,7 +1057,7 @@ public OnPlayerKilled()
 
 	iXP = give_user_xp(iVictim, get_xp_reward(iVictim, XPREWARD_DEATH), CRXRANKS_XPS_REWARD)
 
-	if(iXP != 0)
+	if(should_send_kill_message(iXP))
 	{
 		CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
 	}
@@ -1349,6 +1349,11 @@ bool:has_argument(const szMessage[], const szArg[])
 bool:should_skip(const iNum)
 {
 	return (iNum != 0 && !g_eSettings[USE_COMBINED_EVENTS])
+}
+
+bool:should_send_kill_message(const iXP)
+{
+	return (g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
 }
 
 send_chat_message(const id, const bool:bLog, const szInput[], any:...)
