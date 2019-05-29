@@ -14,8 +14,12 @@
 new CC_PREFIX[64]
 #endif
 
-#if AMXX_VERSION_NUM < 183
-	#include <dhudmessage>
+#if AMXX_VERSION_NUM < 183 || !defined set_dhudmessage
+	#tryinclude <dhudmessage>
+
+	#if !defined _dhudmessage_included
+		#error "dhudmessage.inc" is missing in your "scripting/include" folder. Download it from: "https://amxx-bg.info/inc/"
+	#endif
 #endif
 
 #include <crxranks_const>
@@ -28,7 +32,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.3"
+new const PLUGIN_VERSION[] = "3.3.1"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
