@@ -17,6 +17,9 @@ CRXRANKS_NOTIFY_SUICIDE_LOSE = You lost &x04%i XP &x01for &x03committing suicide
 CRXRANKS_NOTIFY_DEATH_GET = You received &x04%i XP &x01for dying.
 CRXRANKS_NOTIFY_DEATH_LOSE = You lost &x04%i XP &x01for dying.
 CRXRANKS_MYSQL_FAILED = MySQL connection failed. The plugin will use nVault instead.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD information is &x07disabled &x01by &x04the administrator&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD information &x06enabled&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD information &x07disabled&x01.
 
 [mk] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash &x04%i/%i XP&x01. Tvojot rank e &x04#%i&x01: &x03%s&x01. Sleden rank: &x03%s&x01.
@@ -32,11 +35,14 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_NOTIFY_KILL_GET = Dobi &x04%i XP &x01za ubistvoto na &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Izgubi &x04%i XP &x01za ubistvoto na &x03%s
-CRXRANKS_NOTIFY_SUICIDE_GET = Dobi &x04%i XP &x01zatoa shto &x03izvrshi samoubistvo&x01.
-CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi &x04%i XP &x01zatoa shto &x03izvrshi samoubistvo&x01.
-CRXRANKS_NOTIFY_DEATH_GET = Dobi &x04%i XP &x01zatoa shto umre.
-CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi &x04%i XP &x01zatoa shto umre.
+CRXRANKS_NOTIFY_SUICIDE_GET = Dobi &x04%i XP &x01bidejkji &x03izvrshi samoubistvo&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi &x04%i XP &x01bidejkji &x03izvrshi samoubistvo&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Dobi &x04%i XP &x01bidejkji umre.
+CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi &x04%i XP &x01bidejkji umre.
 CRXRANKS_MYSQL_FAILED = Neuspeshno povrzuvanje so MySQL. Pluginot kje koristi nVault.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD informacijata e &x07iskluchena &x01od &x04administratorot&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD informacijata e &x06vkluchena&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD informacijata e &x07iskluchena&x01.
 
 [bg] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash &x04%i/%i XP&x01. Tvoqt rank e &x04#%i&x01: &x03%s&x01. Sledvasht rank: &x03%s&x01.
@@ -57,6 +63,9 @@ CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi &x04%i XP &x01zashtoto &x03izvurshi samoub
 CRXRANKS_NOTIFY_DEATH_GET = Poluchi &x04%i XP &x01zashtoto umrq.
 CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi &x04%i XP &x01zashtoto umrq.
 CRXRANKS_MYSQL_FAILED = Neuspeshno svurzvane s MySQL. Pluginut shte polzva nVault.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD informaciqta e &x07izkliuchena &x01ot &x04administratora&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD informaciqta e &x06vkliuchena&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD informaciqta e &x07izkliuchena&x01.
 
 [bp] -- tarsisd2, iceeedr
 CRXRANKS_RANKINFO_NORMAL = Voce tem &x04%i/%i XP&x01. Seu rank &x04#%i&x01: &x03%s&x01. Proximo rank: &x03%s&x01.

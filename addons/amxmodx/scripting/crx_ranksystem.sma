@@ -32,7 +32,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.3.1"
+new const PLUGIN_VERSION[] = "3.4"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -122,6 +122,7 @@ enum _:PlayerData
 	Rank[CRXRANKS_MAX_RANK_LENGTH],
 	NextRank[CRXRANKS_MAX_RANK_LENGTH],
 	HUDInfo[CRXRANKS_MAX_HUDINFO_LENGTH],
+	bool:HudInfoEnabled,
 	bool:IsOnFinalLevel,
 	bool:IsVIP,
 	bool:IsBot
@@ -207,6 +208,8 @@ public plugin_init()
 
 	register_clcmd("say /xplist",            "Cmd_XPList",      ADMIN_BAN)
 	register_clcmd("say_team /xplist",       "Cmd_XPList",      ADMIN_BAN)
+	register_clcmd("say /hudinfo",           "Cmd_HudInfo",     ADMIN_ALL)
+	register_clcmd("say_team /hudinfo",      "Cmd_HudInfo",     ADMIN_ALL)
 	register_concmd("crxranks_give_xp",      "Cmd_GiveXP",      ADMIN_RCON, "<nick|#userid> <amount>")
 	register_concmd("crxranks_reset_xp",     "Cmd_ResetXP",     ADMIN_RCON, "<nick|#userid>")
 	register_srvcmd("crxranks_update_mysql", "Cmd_UpdateMySQL")
@@ -699,6 +702,11 @@ public DisplayHUD(id)
 {
 	id -= TASK_HUD
 
+	if(!g_ePlayerData[id][HudInfoEnabled])
+	{
+		return
+	}
+
 	static iTarget
 	iTarget = id
 
@@ -791,6 +799,24 @@ public Cmd_XPList(id, iLevel, iCid)
 	}
 
 	menu_display(id, iMenu)
+	return PLUGIN_HANDLED
+}
+
+public Cmd_HudInfo(id, iLevel, iCid)
+{
+	if(!cmd_access(id, iLevel, iCid, 1))
+	{
+		return PLUGIN_HANDLED
+	}
+
+	if(!g_eSettings[HUDINFO_ENABLED])
+	{
+		CC_SendMessage(id, "%L", id, "CRXRANKS_HUDINFO_UNAVAILABLE")
+		return PLUGIN_HANDLED
+	}
+
+	g_ePlayerData[id][HudInfoEnabled] = !g_ePlayerData[id][HudInfoEnabled]
+	CC_SendMessage(id, "%L", id, g_ePlayerData[id][HudInfoEnabled] ? "CRXRANKS_HUDINFO_ENABLED" : "CRXRANKS_HUDINFO_DISABLED")
 	return PLUGIN_HANDLED
 }
 
@@ -1331,6 +1357,7 @@ reset_player_stats(const id)
 	g_ePlayerData[id][Rank][0] = EOS
 	g_ePlayerData[id][NextRank][0] = EOS
 	g_ePlayerData[id][HUDInfo][0] = EOS
+	g_ePlayerData[id][HudInfoEnabled] = true
 	g_ePlayerData[id][IsOnFinalLevel] = false
 	g_ePlayerData[id][IsVIP] = false
 	g_ePlayerData[id][IsBot] = false
@@ -1553,6 +1580,7 @@ public plugin_natives()
 	register_native("crxranks_get_xp_for_level",        "_crxranks_get_xp_for_level")
 	register_native("crxranks_get_xp_reward",           "_crxranks_get_xp_reward")
 	register_native("crxranks_give_user_xp",            "_crxranks_give_user_xp")
+	register_native("crxranks_has_user_hudinfo",        "_crxranks_has_user_hudinfo")
 	register_native("crxranks_is_hi_using_dhud",        "_crxranks_is_hi_using_dhud")
 	register_native("crxranks_is_hud_enabled",          "_crxranks_is_hud_enabled")
 	register_native("crxranks_is_sfdn_enabled",         "_crxranks_is_sfdn_enabled")
@@ -1702,6 +1730,11 @@ public _crxranks_give_user_xp(iPlugin, iParams)
 	iReward = get_param(2)
 	give_user_xp(id, iReward, CRXRanks_XPSources:get_param(4))
 	return iReward
+}
+
+public bool:_crxranks_has_user_hudinfo(iPlugin, iParams)
+{
+	return g_ePlayerData[get_param(1)][HudInfoEnabled]
 }
 
 public bool:_crxranks_is_hi_using_dhud(iPlugin, iParams)
