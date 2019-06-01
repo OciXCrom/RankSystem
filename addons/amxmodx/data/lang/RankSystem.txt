@@ -110,6 +110,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i EXP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i EXP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i EXP
 CRXRANKS_MYSQL_FAILED = La conexion MySQL ha fallado. El plugin usara nVault en su lugar.
+CRXRANKS_NOTIFY_SUICIDE_GET = Recibiste &x04%i EXP &x01por &x03cometer suicidio&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Perdiste &x04%i EXP &x01por &x03cometer suicidio&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Recibiste &x04%i EXP &x01por morir.
+CRXRANKS_NOTIFY_DEATH_LOSE = Perdiste &x04%i EXP &x01por morir.
+CRXRANKS_HUDINFO_UNAVAILABLE = La informacion del HUD esta &x07desactivada &x01por &x04el administrador&x01.
+CRXRANKS_HUDINFO_ENABLED = La informacion del HUD esta &x06activada&x01.
+CRXRANKS_HUDINFO_DISABLED = La informacion del HUD esta &x07desactivada&x01.
 
 [sk] -- Belo95135
 CRXRANKS_RANKINFO_NORMAL = Mas &x04%i/%i XP&x01. Tvoja priecka je &x04#%i&x01: &x03%s&x01. Najblizsi rank: &x03%s&x01.
@@ -137,6 +144,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\ySeviye %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_MYSQL_FAILED = MySQL baglantisi basarisiz oldu. Eklenti onun yerine nVault kullanacak.
+CRXRANKS_NOTIFY_SUICIDE_GET = &x03Intihar ettigin &x01icin &x04%i XP &x01kazandin.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = &x03Intihar ettigin &x01icin &x04%i XP %x01kaybettin.
+CRXRANKS_NOTIFY_DEATH_GET = Oldugun icin &x04%i XP &x01kazandin.
+CRXRANKS_NOTIFY_DEATH_LOSE = Oldugun icin &x04%i XP &x01kaybettin.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD bilgisi &x04yonetici &x01tarafindan &x07devre disi birakildi&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD bilgisi &x06aktiflestirildi&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD bilgisi &x07devre disi birakildi&x01.
 
 [de] -- Godofwar, Mordekay
 CRXRANKS_RANKINFO_NORMAL = Du hast &x04%i/%i XP&x01. Dein Rang ist &x04#%i&x01: &x03%s&x01. Nächster Rang: &x03%s&x01.
@@ -151,6 +165,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_MYSQL_FAILED = MySQL Verbindung fehlgeschlagen. Das Plugin wird daher nVault nutzen.
+CRXRANKS_NOTIFY_SUICIDE_GET = Du erhälst &x04%i XP &x01für &x03 deinen Selbstmord&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Du verlierst &x04%i XP &x01durch &x03 deinen Selbstmord&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Du erhälst &x04%i XP &x01für deinen Tod.
+CRXRANKS_NOTIFY_DEATH_LOSE = Du verlierst &x04%i XP &x01durch deinen Tod.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD Information ist &x07deaktiviert &x01durch &x04den Administrator&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD Information &x06aktiviert&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD Information &x07deaktiviert&x01.
 
 [nl] -- NapoleoN#
 CRXRANKS_RANKINFO_NORMAL = Je hebt &x04%i/%i XP&x01. Uw rang is &x04#%i&x01: &x03%s&x01. Volgend rang: &x03%s&x01.

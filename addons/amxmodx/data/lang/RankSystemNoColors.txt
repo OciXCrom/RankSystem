@@ -110,6 +110,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i EXP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i EXP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i EXP
 CRXRANKS_MYSQL_FAILED = La conexion MySQL ha fallado. El plugin usara nVault en su lugar.
+CRXRANKS_NOTIFY_SUICIDE_GET = Recibiste %i EXP por cometer suicidio.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Perdiste %i EXP por cometer suicidio.
+CRXRANKS_NOTIFY_DEATH_GET = Recibiste %i EXP por morir.
+CRXRANKS_NOTIFY_DEATH_LOSE = Perdiste %i EXP por morir.
+CRXRANKS_HUDINFO_UNAVAILABLE = La informacion del HUD esta desactivada por el administrador.
+CRXRANKS_HUDINFO_ENABLED = La informacion del HUD esta activada.
+CRXRANKS_HUDINFO_DISABLED = La informacion del HUD esta desactivada.
 
 [sk] -- Belo95135
 CRXRANKS_RANKINFO_NORMAL = Mas %i/%i XP. Tvoja priecka je #%i: %s. Najblizsi rank: %s.
@@ -137,6 +144,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\ySeviye %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_MYSQL_FAILED = MySQL baglantisi basarisiz oldu. Eklenti onun yerine nVault kullanacak.
+CRXRANKS_NOTIFY_SUICIDE_GET = Intihar ettigin icin %i XP kazandin.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Intihar ettigin icin %i XP %x01kaybettin.
+CRXRANKS_NOTIFY_DEATH_GET = Oldugun icin %i XP kazandin.
+CRXRANKS_NOTIFY_DEATH_LOSE = Oldugun icin %i XP kaybettin.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD bilgisi yonetici tarafindan devre disi birakildi.
+CRXRANKS_HUDINFO_ENABLED = HUD bilgisi aktiflestirildi.
+CRXRANKS_HUDINFO_DISABLED = HUD bilgisi devre disi birakildi.
 
 [de] -- Godofwar, Mordekay
 CRXRANKS_RANKINFO_NORMAL = Du hast %i/%i XP. Dein Rang ist #%i: %s. Nächster Rang: %s.
@@ -151,6 +165,13 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_MYSQL_FAILED = MySQL Verbindung fehlgeschlagen. Das Plugin wird daher nVault nutzen.
+CRXRANKS_NOTIFY_SUICIDE_GET = Du erhälst %i XP für  deinen Selbstmord.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Du verlierst %i XP durch  deinen Selbstmord.
+CRXRANKS_NOTIFY_DEATH_GET = Du erhälst %i XP für deinen Tod.
+CRXRANKS_NOTIFY_DEATH_LOSE = Du verlierst %i XP durch deinen Tod.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD Information ist deaktiviert durch den Administrator.
+CRXRANKS_HUDINFO_ENABLED = HUD Information aktiviert.
+CRXRANKS_HUDINFO_DISABLED = HUD Information deaktiviert.
 
 [nl] -- NapoleoN#
 CRXRANKS_RANKINFO_NORMAL = Je hebt %i/%i XP. Uw rang is #%i: %s. Volgend rang: %s.
