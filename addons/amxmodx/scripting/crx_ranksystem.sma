@@ -32,7 +32,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.4"
+new const PLUGIN_VERSION[] = "3.5"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -45,6 +45,10 @@ const TASK_HUD = 304500
 
 #if !defined MAX_NAME_LENGTH
 const MAX_NAME_LENGTH = 32
+#endif
+
+#if !defined MAX_PLAYERS
+const MAX_PLAYERS = 32
 #endif
 
 new const ARG_CURRENT_XP[]          = "$current_xp$"
@@ -74,6 +78,9 @@ new const XPREWARD_BOMB_EXPLODED[]  = "bomb_exploded"
 
 #define HUDINFO_PARAMS clr(g_eSettings[HUDINFO_COLOR][0]), clr(g_eSettings[HUDINFO_COLOR][1]), clr(g_eSettings[HUDINFO_COLOR][2]),\
 g_eSettings[HUDINFO_POSITION][0], g_eSettings[HUDINFO_POSITION][1], 0, 0.1, 1.0, 0.1, 0.1
+
+#define HUDINFO_PARAMS_DEAD clr(g_eSettings[HUDINFO_COLOR][0]), clr(g_eSettings[HUDINFO_COLOR][1]), clr(g_eSettings[HUDINFO_COLOR][2]),\
+g_eSettings[HUDINFO_POSITION_DEAD][0], g_eSettings[HUDINFO_POSITION_DEAD][1], 0, 0.1, 1.0, 0.1, 0.1
 
 #define XP_NOTIFIER_PARAMS_GET clr(g_eSettings[XP_NOTIFIER_COLOR_GET][0]), clr(g_eSettings[XP_NOTIFIER_COLOR_GET][1]), clr(g_eSettings[XP_NOTIFIER_COLOR_GET][2]),\
 g_eSettings[XP_NOTIFIER_POSITION][0], g_eSettings[XP_NOTIFIER_POSITION][1], .holdtime = g_eSettings[XP_NOTIFIER_DURATION]
@@ -144,11 +151,11 @@ enum _:Settings
 	LEVELDN_SOUND[MAX_SOUND_LENGTH],
 	bool:LEVELDN_SCREEN_FADE_ENABLED,
 	LEVELDN_SCREEN_FADE_COLOR[4],
-	FINAL_LEVEL_FLAGS[32],
+	FINAL_LEVEL_FLAGS[MAX_NAME_LENGTH],
 	FINAL_LEVEL_FLAGS_BIT,
-	VIP_FLAGS[32],
+	VIP_FLAGS[MAX_NAME_LENGTH],
 	VIP_FLAGS_BIT,
-	VAULT_NAME[32],
+	VAULT_NAME[MAX_NAME_LENGTH],
 	TEAM_LOCK,
 	MINIMUM_PLAYERS,
 	bool:IGNORE_BOTS,
@@ -160,10 +167,11 @@ enum _:Settings
 	bool:HUDINFO_OTHER_PLAYERS,
 	HUDINFO_COLOR[3],
 	Float:HUDINFO_POSITION[2],
+	Float:HUDINFO_POSITION_DEAD[2],
 	bool:HUDINFO_USE_DHUD,
 	HUDINFO_FORMAT[CRXRANKS_MAX_HUDINFO_LENGTH],
 	HUDINFO_FORMAT_FINAL[CRXRANKS_MAX_HUDINFO_LENGTH],
-	HUDINFO_INVALID_TEXT[32],
+	HUDINFO_INVALID_TEXT[MAX_NAME_LENGTH],
 	bool:XP_NOTIFIER_ENABLED,
 	XP_NOTIFIER_COLOR_GET[3],
 	XP_NOTIFIER_COLOR_LOSE[3],
@@ -173,7 +181,7 @@ enum _:Settings
 }
 
 new g_eSettings[Settings]
-new g_ePlayerData[33][PlayerData]
+new g_ePlayerData[MAX_PLAYERS + 1][PlayerData]
 new g_szMaxLevels[CRXRANKS_MAX_XP_LENGTH]
 new g_szSqlError[MAX_SQL_LENGTH]
 new Handle:g_iSqlTuple
@@ -267,7 +275,7 @@ public plugin_precache()
 	g_aLevels = ArrayCreate(16)
 	ArrayPushCell(g_aLevels, 0)
 
-	g_aRankNames = ArrayCreate(32)
+	g_aRankNames = ArrayCreate(MAX_NAME_LENGTH)
 	ArrayPushString(g_aRankNames, "")
 
 	g_tSettings = TrieCreate()
@@ -303,7 +311,7 @@ ReadFile()
 	if(iFilePointer)
 	{
 		new szData[CRXRANKS_MAX_HUDINFO_LENGTH + MAX_NAME_LENGTH], szValue[CRXRANKS_MAX_HUDINFO_LENGTH], szMap[MAX_NAME_LENGTH], szKey[MAX_NAME_LENGTH]
-		new szTemp[4][5], bool:bRead = true, i, iSize, iSection = SECTION_NONE
+		new szTemp[4][5], bool:bRead = true, bool:bHasDeadPosition, i, iSize, iSection = SECTION_NONE
 		get_mapname(szMap, charsmax(szMap))
 
 		while(!feof(iFilePointer))
@@ -363,11 +371,6 @@ ReadFile()
 
 					strtok(szData, szKey, charsmax(szKey), szValue, charsmax(szValue), '=')
 					trim(szKey); trim(szValue)
-
-					if(!szValue[0])
-					{
-						continue
-					}
 
 					switch(iSection)
 					{
@@ -536,6 +539,16 @@ ReadFile()
 									g_eSettings[HUDINFO_POSITION][i] = _:floatclamp(str_to_float(szTemp[i]), -1.0, 1.0)
 								}
 							}
+							else if(equal(szKey, "HUDINFO_POSITION_DEAD"))
+							{
+								bHasDeadPosition = true
+								parse(szValue, szTemp[0], charsmax(szTemp[]), szTemp[1], charsmax(szTemp[]))
+
+								for(i = 0; i < 2; i++)
+								{
+									g_eSettings[HUDINFO_POSITION_DEAD][i] = _:floatclamp(str_to_float(szTemp[i]), -1.0, 1.0)
+								}
+							}
 							else if(equal(szKey, "HUDINFO_USE_DHUD"))
 							{
 								g_eSettings[HUDINFO_USE_DHUD] = _:clamp(str_to_num(szValue), false, true)
@@ -604,7 +617,7 @@ ReadFile()
 						}
 						case SECTION_RANKS:
 						{
-							ArrayPushCell(g_aLevels, clamp(str_to_num(szValue), 0))
+							ArrayPushCell(g_aLevels, g_iMaxLevels == 0 ? 0 : clamp(str_to_num(szValue), 0))
 							ArrayPushString(g_aRankNames, szKey)
 							g_iMaxLevels++
 						}
@@ -623,6 +636,14 @@ ReadFile()
 						}
 					}
 				}
+			}
+		}
+
+		if(!bHasDeadPosition)
+		{
+			for(i = 0; i < 2; i++)
+			{
+				g_eSettings[HUDINFO_POSITION_DEAD][i] = _:g_eSettings[HUDINFO_POSITION][i]
 			}
 		}
 
@@ -707,10 +728,12 @@ public DisplayHUD(id)
 		return
 	}
 
-	static iTarget
+	static bool:bIsAlive, iTarget
+
+	bIsAlive = is_user_alive(id) != 0
 	iTarget = id
 
-	if(!is_user_alive(id))
+	if(!bIsAlive)
 	{
 		if(g_eSettings[HUDINFO_ALIVE_ONLY])
 		{
@@ -735,12 +758,28 @@ public DisplayHUD(id)
 
 	if(g_eSettings[HUDINFO_USE_DHUD])
 	{
-		set_dhudmessage(HUDINFO_PARAMS)
+		if(bIsAlive)
+		{
+			set_dhudmessage(HUDINFO_PARAMS)
+		}
+		else
+		{
+			set_dhudmessage(HUDINFO_PARAMS_DEAD)
+		}
+
 		show_dhudmessage(id, g_ePlayerData[iTarget][HUDInfo])
 	}
 	else
 	{
-		set_hudmessage(HUDINFO_PARAMS)
+		if(bIsAlive)
+		{
+			set_hudmessage(HUDINFO_PARAMS)
+		}
+		else
+		{
+			set_hudmessage(HUDINFO_PARAMS_DEAD)
+		}
+
 		ShowSyncHudMsg(id, g_iObject[OBJ_HUDINFO], g_ePlayerData[iTarget][HUDInfo])
 	}
 }
@@ -787,10 +826,10 @@ public Cmd_XPList(id, iLevel, iCid)
 	new szTitle[128]
 	formatex(szTitle, charsmax(szTitle), "%L", id, "CRXRANKS_MENU_TITLE")
 
-	new iPlayers[32], iPnum, iMenu = menu_create(szTitle, "XPList_Handler")
+	new iPlayers[MAX_PLAYERS], iPnum, iMenu = menu_create(szTitle, "XPList_Handler")
 	get_players(iPlayers, iPnum); SortCustom1D(iPlayers, iPnum, "sort_players_by_xp")
 
-	for(new szItem[128], szName[32], iPlayer, i; i < iPnum; i++)
+	for(new szItem[128], szName[MAX_NAME_LENGTH], iPlayer, i; i < iPnum; i++)
 	{
 		iPlayer = iPlayers[i]
 		get_user_name(iPlayer, szName, charsmax(szName))
@@ -848,7 +887,7 @@ public Cmd_GiveXP(id, iLevel, iCid)
 	get_user_name(id, szName[0], charsmax(szName[]))
 	get_user_name(iPlayer, szName[1], charsmax(szName[]))
 
-	new szKey[32], iXP = str_to_num(szAmount)
+	new szKey[MAX_NAME_LENGTH], iXP = str_to_num(szAmount)
 	give_user_xp(iPlayer, iXP, CRXRANKS_XPS_ADMIN)
 
 	if(iXP >= 0)
@@ -1303,7 +1342,7 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 
 	if(g_eSettings[XP_NOTIFIER_ENABLED])
 	{
-		static szKey[32], bool:bPositive
+		static szKey[MAX_NAME_LENGTH], bool:bPositive
 		bPositive = iXP >= 0
 
 		copy(szKey, charsmax(szKey), bPositive ? "CRXRANKS_XP_NOTIFIER_GET" : "CRXRANKS_XP_NOTIFIER_LOSE")
@@ -1412,7 +1451,7 @@ update_hudinfo(const id)
 		return
 	}
 
-	static szMessage[CRXRANKS_MAX_HUDINFO_LENGTH], szPlaceHolder[32], bool:bIsOnFinal
+	static szMessage[CRXRANKS_MAX_HUDINFO_LENGTH], szPlaceHolder[MAX_NAME_LENGTH], bool:bIsOnFinal
 
 	bIsOnFinal = g_ePlayerData[id][IsOnFinalLevel]
 	copy(szMessage, charsmax(szMessage), g_eSettings[bIsOnFinal ? HUDINFO_FORMAT_FINAL : HUDINFO_FORMAT])
@@ -1504,7 +1543,7 @@ check_level(const id, const bool:bNotify)
 
 		if(bNotify && g_eSettings[LEVELUP_MESSAGE_TYPE])
 		{
-			static szMessage[128], szName[32], bool:bGlobalMsg
+			static szMessage[128], szName[MAX_NAME_LENGTH], bool:bGlobalMsg
 			get_user_name(id, szName, charsmax(szName))
 			bGlobalMsg = g_eSettings[LEVELUP_MESSAGE_TYPE] == 2
 
