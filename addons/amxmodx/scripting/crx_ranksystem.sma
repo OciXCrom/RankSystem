@@ -32,7 +32,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.5"
+new const PLUGIN_VERSION[] = "3.5.1"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -1543,13 +1543,24 @@ check_level(const id, const bool:bNotify)
 
 		if(bNotify && g_eSettings[LEVELUP_MESSAGE_TYPE])
 		{
-			static szMessage[128], szName[MAX_NAME_LENGTH], bool:bGlobalMsg
+			static szName[MAX_NAME_LENGTH]
 			get_user_name(id, szName, charsmax(szName))
-			bGlobalMsg = g_eSettings[LEVELUP_MESSAGE_TYPE] == 2
 
-			formatex(szMessage, charsmax(szMessage), "%L", bGlobalMsg ? LANG_PLAYER : id,\
-			bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
-			send_chat_message(bGlobalMsg ? 0 : id, false, szMessage)
+			if(g_eSettings[LEVELUP_MESSAGE_TYPE] == 2)
+			{
+				static iPlayers[MAX_PLAYERS], iPlayer, iPnum
+				get_players(iPlayers, iPnum)
+
+				for(i = 0; i < iPnum; i++)
+				{
+					iPlayer = iPlayers[i]
+					send_chat_message(iPlayer, false, "%L", iPlayer, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+				}
+			}
+			else
+			{
+				send_chat_message(id, false, "%L", id, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+			}
 
 			if(bLevelUp && g_eSettings[LEVELUP_SOUND][0])
 			{
