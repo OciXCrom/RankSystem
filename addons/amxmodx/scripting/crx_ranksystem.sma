@@ -1,18 +1,11 @@
 #include <amxmodx>
 #include <amxmisc>
+#include <cromchat>
+#include <crxranks_const>
+#include <csx>
 #include <fakemeta>
 #include <nvault>
 #include <sqlx>
-
-// Comment or remove this line in order to run the plugin on a mod different than Counter-Strike.
-#define USE_CSTRIKE
-
-#if defined USE_CSTRIKE
-	#include <cromchat>
-	#include <csx>
-#else
-new CC_PREFIX[64]
-#endif
 
 #if AMXX_VERSION_NUM < 183 || !defined set_dhudmessage
 	#tryinclude <dhudmessage>
@@ -22,8 +15,6 @@ new CC_PREFIX[64]
 	#endif
 #endif
 
-#include <crxranks_const>
-
 #if !defined client_disconnected
 	#define client_disconnected client_disconnect
 #endif
@@ -32,7 +23,7 @@ new CC_PREFIX[64]
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.5.1"
+new const PLUGIN_VERSION[] = "3.6"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -68,11 +59,9 @@ new const XPREWARD_TEAMKILL[]       = "teamkill"
 new const XPREWARD_SUICIDE[]        = "suicide"
 new const XPREWARD_DEATH[]          = "death"
 
-#if defined USE_CSTRIKE
 new const XPREWARD_BOMB_PLANTED[]   = "bomb_planted"
 new const XPREWARD_BOMB_DEFUSED[]   = "bomb_defused"
 new const XPREWARD_BOMB_EXPLODED[]  = "bomb_exploded"
-#endif
 
 #define clr(%1) %1 == -1 ? random(256) : %1
 
@@ -190,6 +179,7 @@ new Array:g_aRankNames
 new Trie:g_tSettings
 new Trie:g_tXPRewards
 new Trie:g_tXPRewardsVIP
+new bool:g_bIsCstrike
 
 new g_iVault
 new g_iMaxLevels
@@ -206,11 +196,15 @@ public plugin_init()
 	register_plugin("OciXCrom's Rank System", PLUGIN_VERSION, "OciXCrom")
 	register_cvar("CRXRankSystem", PLUGIN_VERSION, FCVAR_SERVER|FCVAR_SPONLY|FCVAR_UNLOGGED)
 
-	#if defined USE_CSTRIKE
-	register_dictionary("RankSystem.txt")
-	#else
-	register_dictionary("RankSystemNoColors.txt")
-	#endif
+	new szModname[MAX_NAME_LENGTH]
+	get_modname(szModname, charsmax(szModname))
+
+	if(equal(szModname, "cstrike"))
+	{
+		g_bIsCstrike = true
+	}
+
+	register_dictionary(g_bIsCstrike ? "RankSystem.txt" : "RankSystemNoColors.txt")
 
 	register_event("DeathMsg", "OnPlayerKilled", "a")
 
@@ -380,11 +374,14 @@ ReadFile()
 
 							if(equal(szKey, "CHAT_PREFIX"))
 							{
-								#if defined USE_CSTRIKE
-								CC_SetPrefix(szValue)
-								#else
-								copy(CC_PREFIX, charsmax(CC_PREFIX), szValue)
-								#endif
+								if(g_bIsCstrike)
+								{
+									CC_SetPrefix(szValue)
+								}
+								else
+								{
+									copy(CC_PREFIX, charsmax(CC_PREFIX), szValue)
+								}
 							}
 							else if(equal(szKey, "SAVE_TYPE"))
 							{
@@ -432,7 +429,7 @@ ReadFile()
 
 								if(szValue[0])
 								{
-									precache_sound(szValue)
+									precache_sound_if_found(szValue)
 								}
 							}
 							else if(equal(szKey, "LEVELUP_SCREEN_FADE_ENABLED"))
@@ -454,7 +451,7 @@ ReadFile()
 
 								if(szValue[0])
 								{
-									precache_sound(szValue)
+									precache_sound_if_found(szValue)
 								}
 							}
 							else if(equal(szKey, "LEVELDN_SCREEN_FADE_ENABLED"))
@@ -617,7 +614,7 @@ ReadFile()
 						}
 						case SECTION_RANKS:
 						{
-							ArrayPushCell(g_aLevels, g_iMaxLevels == 0 ? 0 : clamp(str_to_num(szValue), 0))
+							ArrayPushCell(g_aLevels, g_iMaxLevels == 0 ? 0 : max(str_to_num(szValue), 0))
 							ArrayPushString(g_aRankNames, szKey)
 							g_iMaxLevels++
 						}
@@ -784,7 +781,6 @@ public DisplayHUD(id)
 	}
 }
 
-#if defined USE_CSTRIKE
 public bomb_planted(id)
 {
 	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_PLANTED), CRXRANKS_XPS_REWARD)
@@ -799,7 +795,6 @@ public bomb_explode(id)
 {
 	give_user_xp(id, get_xp_reward(id, XPREWARD_BOMB_EXPLODED), CRXRANKS_XPS_REWARD)
 }
-#endif
 
 public Cmd_XP(id)
 {
@@ -850,12 +845,12 @@ public Cmd_HudInfo(id, iLevel, iCid)
 
 	if(!g_eSettings[HUDINFO_ENABLED])
 	{
-		CC_SendMessage(id, "%L", id, "CRXRANKS_HUDINFO_UNAVAILABLE")
+		send_chat_message(id, false, "%L", id, "CRXRANKS_HUDINFO_UNAVAILABLE")
 		return PLUGIN_HANDLED
 	}
 
 	g_ePlayerData[id][HudInfoEnabled] = !g_ePlayerData[id][HudInfoEnabled]
-	CC_SendMessage(id, "%L", id, g_ePlayerData[id][HudInfoEnabled] ? "CRXRANKS_HUDINFO_ENABLED" : "CRXRANKS_HUDINFO_DISABLED")
+	send_chat_message(id, false, "%L", id, g_ePlayerData[id][HudInfoEnabled] ? "CRXRANKS_HUDINFO_ENABLED" : "CRXRANKS_HUDINFO_DISABLED")
 	return PLUGIN_HANDLED
 }
 
@@ -1057,7 +1052,7 @@ public OnPlayerKilled()
 
 		if(should_send_kill_message(iXP))
 		{
-			CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
+			send_chat_message(iVictim, false, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
 		}
 
 		return
@@ -1121,14 +1116,14 @@ public OnPlayerKilled()
 	{
 		new szName[MAX_NAME_LENGTH]
 		get_user_name(iVictim, szName, charsmax(szName))
-		CC_SendMessage(iAttacker, "%L", iAttacker, iXP > 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
+		send_chat_message(iAttacker, false, "%L", iAttacker, iXP > 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
 	}
 
 	iXP = give_user_xp(iVictim, get_xp_reward(iVictim, XPREWARD_DEATH), CRXRANKS_XPS_REWARD)
 
 	if(should_send_kill_message(iXP))
 	{
-		CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
+		send_chat_message(iVictim, false, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
 	}
 }
 
@@ -1215,8 +1210,7 @@ save_or_load(const id, const szInfo[], const iType)
 			}
 			else
 			{
-				static iData
-				iData = nvault_get(g_iVault, szInfo)
+				new iData = nvault_get(g_iVault, szInfo)
 				g_ePlayerData[id][XP] = iData ? clamp(iData, 0) : 0
 				check_level(id, false)
 			}
@@ -1382,9 +1376,24 @@ get_user_saveinfo(const id, szInfo[CRXRANKS_MAX_PLAYER_INFO_LENGTH], const iLen)
 {
 	switch(g_eSettings[SAVE_TYPE])
 	{
-		case SAVE_NICKNAME:    get_user_name(id, szInfo, iLen)
-		case SAVE_IP: get_user_ip(id, szInfo, iLen, 1)
-		case SAVE_STEAMID: get_user_authid(id, szInfo, iLen)
+		case SAVE_NICKNAME: get_user_name(id, szInfo, iLen)
+		case SAVE_IP:       get_user_ip(id, szInfo, iLen, 1)
+		case SAVE_STEAMID:  get_user_authid(id, szInfo, iLen)
+	}
+}
+
+precache_sound_if_found(const szValue[])
+{
+	new szSound[MAX_SOUND_LENGTH]
+	format(szSound, charsmax(szSound), "sound/%s", szValue)
+
+	if(file_exists(szSound))
+	{
+		precache_sound(szValue)
+	}
+	else
+	{
+		log_amx("ERROR: sound file ^"%s^" not found", szValue)
 	}
 }
 
@@ -1431,17 +1440,27 @@ send_chat_message(const id, const bool:bLog, const szInput[], any:...)
 	static szMessage[192]
 	vformat(szMessage, charsmax(szMessage), szInput, 4)
 
-	#if defined USE_CSTRIKE
-	bLog ? CC_LogMessage(id, _, szMessage) : CC_SendMessage(id, szMessage)
-	#else
-	format(szMessage, charsmax(szMessage), "%s %s", CC_PREFIX, szMessage)
-	client_print(id, print_chat, szMessage)
-
-	if(bLog)
+	if(g_bIsCstrike)
 	{
-		log_amx(szMessage)
+		if(bLog)
+		{
+			CC_LogMessage(id, _, szMessage)
+		}
+		else
+		{
+			CC_SendMessage(id, szMessage)
+		}
 	}
-	#endif
+	else
+	{
+		format(szMessage, charsmax(szMessage), "%s %s", CC_PREFIX, szMessage)
+		client_print(id, print_chat, szMessage)
+
+		if(bLog)
+		{
+			log_amx(szMessage)
+		}
+	}
 }
 
 update_hudinfo(const id)
@@ -1576,7 +1595,7 @@ check_level(const id, const bool:bNotify)
 				message_begin(MSG_ONE, g_iScreenFade, {0, 0, 0}, id)
 				write_short(1<<10)
 				write_short(1<<10)
-				write_short(0x0000)
+				write_short(0)
 
 				if(bLevelUp)
 				{
