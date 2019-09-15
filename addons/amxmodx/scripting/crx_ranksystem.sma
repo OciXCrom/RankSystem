@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.7"
+new const PLUGIN_VERSION[] = "3.8"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -66,6 +66,10 @@ new const XPREWARD_BOMB_EXPLODED[]  = "bomb_exploded"
 
 new const XPREWARD_TEAM_WIN[]       = "team_win"
 new const XPREWARD_TEAM_LOSE[]      = "team_lose"
+new const XPREWARD_TEAM_WIN_CT[]    = "team_win_ct"
+new const XPREWARD_TEAM_WIN_T[]     = "team_win_t"
+new const XPREWARD_TEAM_LOSE_CT[]   = "team_lose_ct"
+new const XPREWARD_TEAM_LOSE_T[]    = "team_lose_t"
 
 #define clr(%1) %1 == -1 ? random(256) : %1
 
@@ -194,8 +198,6 @@ new Trie:g_tSettings
 new Trie:g_tXPRewards
 new Trie:g_tXPRewardsVIP
 new bool:g_bIsCstrike
-new bool:g_bTeamWin
-new bool:g_bTeamLose
 
 new g_iVault
 new g_iMaxLevels
@@ -221,7 +223,7 @@ public plugin_init()
 		register_logevent("OnRoundEnd", 2, "1=Round_End")
 	}
 
-	if(g_bIsCstrike && (g_bTeamWin || g_bTeamLose))
+	if(g_bIsCstrike)
 	{
 		register_event("SendAudio", "OnTeamWin", "a", "2&%!MRAD_terwin", "2&%!MRAD_ctwin")
 	}
@@ -658,15 +660,6 @@ ReadFile()
 							parse(szValue, szReward[0], charsmax(szReward[]), szReward[1], charsmax(szReward[]))
 							TrieSetCell(g_tXPRewards, szKey, str_to_num(szReward[0]))
 
-							if(equal(szKey, XPREWARD_TEAM_WIN))
-							{
-								g_bTeamWin = true
-							}
-							else if(equal(szKey, XPREWARD_TEAM_LOSE))
-							{
-								g_bTeamLose = true
-							}
-
 							if(szReward[1][0])
 							{
 								TrieSetCell(g_tXPRewardsVIP, szKey, str_to_num(szReward[1]))
@@ -985,19 +978,44 @@ public OnRoundEnd()
 
 public OnTeamWin()
 {
-	new szTeam[MAX_TEAM_LENGTH], szWinTeam[MAX_TEAM_LENGTH]
-	read_data(2, szWinTeam, charsmax(szWinTeam))
+	new szTeam[MAX_TEAM_LENGTH], szWinTeam[MAX_TEAM_LENGTH], szLoseTeam[MAX_TEAM_LENGTH]
+	read_data(2, szTeam, charsmax(szTeam))
+	copy(szWinTeam, charsmax(szWinTeam),   szTeam[7] == 'c' ? "CT" : "TERRORIST")
+	copy(szLoseTeam, charsmax(szLoseTeam), szTeam[7] == 'c' ? "TERRORIST" : "CT")
 
-	if(g_bTeamWin)
+	if(xp_reward_is_set(XPREWARD_TEAM_WIN))
 	{
-		copy(szTeam, charsmax(szTeam), szWinTeam[7] == 'c' ? "CT" : "TERRORIST")
-		reward_team(szTeam, XPREWARD_TEAM_WIN)
+		reward_team(szWinTeam, XPREWARD_TEAM_WIN)
 	}
 
-	if(g_bTeamLose)
+	if(xp_reward_is_set(XPREWARD_TEAM_LOSE))
 	{
-		copy(szTeam, charsmax(szTeam), szWinTeam[7] == 'c' ? "TERRORIST" : "CT")
-		reward_team(szTeam, XPREWARD_TEAM_LOSE)
+		reward_team(szLoseTeam, XPREWARD_TEAM_LOSE)
+	}
+
+	if(szWinTeam[0] == 'C')
+	{
+		if(xp_reward_is_set(XPREWARD_TEAM_WIN_CT))
+		{
+			reward_team(szWinTeam, XPREWARD_TEAM_WIN_CT)
+		}
+
+		if(xp_reward_is_set(XPREWARD_TEAM_LOSE_T))
+		{
+			reward_team(szLoseTeam, XPREWARD_TEAM_LOSE_T)
+		}
+	}
+	else
+	{
+		if(xp_reward_is_set(XPREWARD_TEAM_WIN_T))
+		{
+			reward_team(szWinTeam, XPREWARD_TEAM_WIN_T)
+		}
+
+		if(xp_reward_is_set(XPREWARD_TEAM_LOSE_CT))
+		{
+			reward_team(szLoseTeam, XPREWARD_TEAM_LOSE_CT)
+		}
 	}
 }
 
@@ -1118,7 +1136,12 @@ public QueryHandler(iFailState, Handle:iQuery, szError[], iErrorCode)
 	}
 }
 
-reward_team(const szTeam[], const szXPReward[])
+bool:xp_reward_is_set(const szReward[])
+{
+	return TrieKeyExists(g_tXPRewards, szReward)
+}
+
+reward_team(const szTeam[], const szReward[])
 {
 	new iPlayers[MAX_PLAYERS], iPnum
 	get_players(iPlayers, iPnum, "e", szTeam)
@@ -1126,7 +1149,7 @@ reward_team(const szTeam[], const szXPReward[])
 	for(new i, iPlayer; i < iPnum; i++)
 	{
 		iPlayer = iPlayers[i]
-		give_user_xp(iPlayer, get_xp_reward(iPlayer, szXPReward), CRXRANKS_XPS_REWARD)
+		give_user_xp(iPlayer, get_xp_reward(iPlayer, szReward), CRXRANKS_XPS_REWARD)
 	}
 }
 
@@ -1629,6 +1652,7 @@ public plugin_natives()
 	register_native("crxranks_is_xpn_using_dhud",       "_crxranks_is_xpn_using_dhud")
 	register_native("crxranks_set_user_xp",             "_crxranks_set_user_xp")
 	register_native("crxranks_using_comb_events",       "_crxranks_using_comb_events")
+	register_native("crxranks_xp_reward_is_set",        "_crxranks_xp_reward_is_set")
 }
 
 public _crxranks_get_chat_prefix(iPlugin, iParams)
@@ -1809,6 +1833,12 @@ public bool:_crxranks_is_xpn_enabled(iPlugin, iParams)
 	return g_eSettings[XP_NOTIFIER_ENABLED]
 }
 
+public bool:_crxranks_is_xpn_using_dhud(iPlugin, iParams)
+{
+	return g_eSettings[XP_NOTIFIER_USE_DHUD]
+}
+
+
 public bool:_crxranks_set_user_xp(iPlugin, iParams)
 {
 	new iReturn, id = get_param(1), CRXRanks_XPSources:iSource = CRXRanks_XPSources:get_param(3)
@@ -1828,7 +1858,9 @@ public bool:_crxranks_using_comb_events(iPlugin, iParams)
 	return g_eSettings[USE_COMBINED_EVENTS]
 }
 
-public bool:_crxranks_is_xpn_using_dhud(iPlugin, iParams)
+public bool:_crxranks_xp_reward_is_set(iPlugin, iParams)
 {
-	return g_eSettings[XP_NOTIFIER_USE_DHUD]
+	new szReward[CRXRANKS_MAX_XP_REWARD_LENGTH]
+	get_string(1, szReward, charsmax(szReward))
+	return xp_reward_is_set(szReward)
 }
