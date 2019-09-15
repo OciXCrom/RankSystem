@@ -299,3 +299,11 @@ native crxranks_set_user_xp(id, amount, CRXRanks_XPSources:source = CRXRANKS_XPS
  * @return				True if it is, false otherwise.
  */
 native bool:crxranks_using_combined_events()
+
+/**
+ * Checks whether the specified XP reward is set in the configuration file.
+ *
+ * @param reward		The XP reward to check.
+ * @return				True if it is, false otherwise.
+ */
+native bool:crxranks_xp_reward_is_set(reward[])
