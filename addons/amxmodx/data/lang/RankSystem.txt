@@ -84,7 +84,7 @@ CRXRANKS_NOTIFY_KILL_LOSE = Voce perdeu &x04%i XP &x01por matar &x03%s
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Voce perdeu &x04%i XP &x01por &x03suicidar&x01.
 CRXRANKS_MYSQL_FAILED = A conexao MYSQL falhou. O plugin usara nVault.
 
-[ro] -- DevilBoy.eXe
+[ro] -- DevilBoy.eXe, aEEk
 CRXRANKS_RANKINFO_NORMAL = Ai &x04%i/%i XP&x01. Rangul tau este &x04#%i&x01: &x03%s&x01. Urmatorul rang: &x03%s&x01.
 CRXRANKS_RANKINFO_FINAL = Ai &x04%i XP&x01. Rangul tau este &x04#%i&x01: &x03%s&x01. Ai ajung la ultimul nivel!
 CRXRANKS_GIVE_XP = &x03%s &x01a dat &x04%i XP &x01lui &x03%s
@@ -96,6 +96,14 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang System: \rLista XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_SUICIDE_GET = Ai primit &x04%i XP &x01pentru &x03sinucidere&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Ai pierdut &x04%i XP &x01pentru &x03sinucidere&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Ai primit &x04%i XP &x01pentru deces.
+CRXRANKS_NOTIFY_DEATH_LOSE = Ai pierdut &x04%i XP &x01pentru deces.
+CRXRANKS_MYSQL_FAILED = Conexiunea MySQL a esuat. Pluginul va folosi nVault.
+CRXRANKS_HUDINFO_UNAVAILABLE = Informatiile prin HUD au fost &x07dezactivate &x01de &x04administrator&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD info &x06activ&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD info &x07inactiv&x01.
 
 [es] -- Rivotril, teol
 CRXRANKS_RANKINFO_NORMAL = Tienes &x04%i/%i EXP&x01. Tu rango es &x04#%i&x01: &x03%s&x01. Sig. Rango: &x03%s&x01.
