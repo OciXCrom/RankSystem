@@ -17,9 +17,9 @@ CRXRANKS_NOTIFY_SUICIDE_LOSE = You lost %i XP for committing suicide.
 CRXRANKS_NOTIFY_DEATH_GET = You received %i XP for dying.
 CRXRANKS_NOTIFY_DEATH_LOSE = You lost %i XP for dying.
 CRXRANKS_MYSQL_FAILED = MySQL connection failed. The plugin will use nVault instead.
-CRXRANKS_HUDINFO_UNAVAILABLE = HUD information is disabled by the administrator.
-CRXRANKS_HUDINFO_ENABLED = HUD information enabled.
-CRXRANKS_HUDINFO_DISABLED = HUD information disabled.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD information is &x07disabled by the administrator.
+CRXRANKS_HUDINFO_ENABLED = HUD information &x06enabled.
+CRXRANKS_HUDINFO_DISABLED = HUD information &x07disabled.
 
 [mk] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvojot rank e #%i: %s. Sleden rank: %s.
@@ -40,9 +40,9 @@ CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi %i XP bidejkji izvrshi samoubistvo.
 CRXRANKS_NOTIFY_DEATH_GET = Dobi %i XP bidejkji umre.
 CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi %i XP bidejkji umre.
 CRXRANKS_MYSQL_FAILED = Neuspeshno povrzuvanje so MySQL. Pluginot kje koristi nVault.
-CRXRANKS_HUDINFO_UNAVAILABLE = HUD informacijata e iskluchena od administratorot.
-CRXRANKS_HUDINFO_ENABLED = HUD informacijata e vkluchena.
-CRXRANKS_HUDINFO_DISABLED = HUD informacijata e iskluchena.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD informacijata e &x07iskluchena od administratorot.
+CRXRANKS_HUDINFO_ENABLED = HUD informacijata e &x06vkluchena.
+CRXRANKS_HUDINFO_DISABLED = HUD informacijata e &x07iskluchena.
 
 [bg] -- OciXCrom
 CRXRANKS_RANKINFO_NORMAL = Imash %i/%i XP. Tvoqt rank e #%i: %s. Sledvasht rank: %s.
@@ -63,9 +63,9 @@ CRXRANKS_NOTIFY_SUICIDE_LOSE = Izgubi %i XP zashtoto izvurshi samoubiistvo.
 CRXRANKS_NOTIFY_DEATH_GET = Poluchi %i XP zashtoto umrq.
 CRXRANKS_NOTIFY_DEATH_LOSE = Izgubi %i XP zashtoto umrq.
 CRXRANKS_MYSQL_FAILED = Neuspeshno svurzvane s MySQL. Pluginut shte polzva nVault.
-CRXRANKS_HUDINFO_UNAVAILABLE = HUD informaciqta e izkliuchena ot administratora.
-CRXRANKS_HUDINFO_ENABLED = HUD informaciqta e vkliuchena.
-CRXRANKS_HUDINFO_DISABLED = HUD informaciqta e izkliuchena.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD informaciqta e &x07izkliuchena ot administratora.
+CRXRANKS_HUDINFO_ENABLED = HUD informaciqta e &x06vkliuchena.
+CRXRANKS_HUDINFO_DISABLED = HUD informaciqta e &x07izkliuchena.
 
 [bp] -- tarsisd2, iceeedr
 CRXRANKS_RANKINFO_NORMAL = Voce tem %i/%i XP. Seu rank #%i: %s. Proximo rank: %s.
@@ -84,7 +84,7 @@ CRXRANKS_NOTIFY_KILL_LOSE = Voce perdeu %i XP por matar %s
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Voce perdeu %i XP por suicidar.
 CRXRANKS_MYSQL_FAILED = A conexao MYSQL falhou. O plugin usara nVault.
 
-[ro] -- DevilBoy.eXe
+[ro] -- DevilBoy.eXe, aEEk
 CRXRANKS_RANKINFO_NORMAL = Ai %i/%i XP. Rangul tau este #%i: %s. Urmatorul rang: %s.
 CRXRANKS_RANKINFO_FINAL = Ai %i XP. Rangul tau este #%i: %s. Ai ajung la ultimul nivel!
 CRXRANKS_GIVE_XP = %s a dat %i XP lui %s
@@ -96,6 +96,14 @@ CRXRANKS_MENU_TITLE = \rOciXCrom's \yRang System: \rLista XP
 CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yNivel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_SUICIDE_GET = Ai primit %i XP pentru sinucidere.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Ai pierdut %i XP pentru sinucidere.
+CRXRANKS_NOTIFY_DEATH_GET = Ai primit %i XP pentru deces.
+CRXRANKS_NOTIFY_DEATH_LOSE = Ai pierdut %i XP pentru deces.
+CRXRANKS_MYSQL_FAILED = Conexiunea MySQL a esuat. Pluginul va folosi nVault.
+CRXRANKS_HUDINFO_UNAVAILABLE = Informatiile prin HUD au fost &x07dezactivate de administrator.
+CRXRANKS_HUDINFO_ENABLED = HUD info &x06activ.
+CRXRANKS_HUDINFO_DISABLED = HUD info &x07inactiv.
 
 [es] -- Rivotril, teol
 CRXRANKS_RANKINFO_NORMAL = Tienes %i/%i EXP. Tu rango es #%i: %s. Sig. Rango: %s.
@@ -116,9 +124,9 @@ CRXRANKS_NOTIFY_SUICIDE_GET = Recibiste %i EXP por cometer suicidio.
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Perdiste %i EXP por cometer suicidio.
 CRXRANKS_NOTIFY_DEATH_GET = Recibiste %i EXP por morir.
 CRXRANKS_NOTIFY_DEATH_LOSE = Perdiste %i EXP por morir.
-CRXRANKS_HUDINFO_UNAVAILABLE = La informacion del HUD esta desactivada por el administrador.
-CRXRANKS_HUDINFO_ENABLED = La informacion del HUD esta activada.
-CRXRANKS_HUDINFO_DISABLED = La informacion del HUD esta desactivada.
+CRXRANKS_HUDINFO_UNAVAILABLE = La informacion del HUD esta &x07desactivada por el administrador.
+CRXRANKS_HUDINFO_ENABLED = La informacion del HUD esta &x06activada.
+CRXRANKS_HUDINFO_DISABLED = La informacion del HUD esta &x07desactivada.
 
 [sk] -- Belo95135
 CRXRANKS_RANKINFO_NORMAL = Mas %i/%i XP. Tvoja priecka je #%i: %s. Najblizsi rank: %s.
@@ -150,9 +158,9 @@ CRXRANKS_NOTIFY_SUICIDE_GET = Intihar ettigin icin %i XP kazandin.
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Intihar ettigin icin %i XP %x01kaybettin.
 CRXRANKS_NOTIFY_DEATH_GET = Oldugun icin %i XP kazandin.
 CRXRANKS_NOTIFY_DEATH_LOSE = Oldugun icin %i XP kaybettin.
-CRXRANKS_HUDINFO_UNAVAILABLE = HUD bilgisi yonetici tarafindan devre disi birakildi.
-CRXRANKS_HUDINFO_ENABLED = HUD bilgisi aktiflestirildi.
-CRXRANKS_HUDINFO_DISABLED = HUD bilgisi devre disi birakildi.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD bilgisi yonetici tarafindan &x07devre disi birakildi.
+CRXRANKS_HUDINFO_ENABLED = HUD bilgisi &x06aktiflestirildi.
+CRXRANKS_HUDINFO_DISABLED = HUD bilgisi &x07devre disi birakildi.
 
 [de] -- Godofwar, Mordekay
 CRXRANKS_RANKINFO_NORMAL = Du hast %i/%i XP. Dein Rang ist #%i: %s. Nächster Rang: %s.
@@ -168,14 +176,14 @@ CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 CRXRANKS_MYSQL_FAILED = MySQL Verbindung fehlgeschlagen. Das Plugin wird daher nVault nutzen.
 CRXRANKS_NOTIFY_KILL_GET = Du erhälst %i XP für's Töten von %s
-CRXRANKS_NOTIFY_KILL_LOSE = Du verlierst i XP für's Töten von %s
+CRXRANKS_NOTIFY_KILL_LOSE = Du verlierst %i XP für's Töten von %s
 CRXRANKS_NOTIFY_SUICIDE_GET = Du erhälst %i XP für  deinen Selbstmord.
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Du verlierst %i XP durch  deinen Selbstmord.
 CRXRANKS_NOTIFY_DEATH_GET = Du erhälst %i XP für deinen Tod.
 CRXRANKS_NOTIFY_DEATH_LOSE = Du verlierst %i XP durch deinen Tod.
-CRXRANKS_HUDINFO_UNAVAILABLE = HUD Information ist deaktiviert durch den Administrator.
-CRXRANKS_HUDINFO_ENABLED = HUD Information aktiviert.
-CRXRANKS_HUDINFO_DISABLED = HUD Information deaktiviert.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD Information ist &x07deaktiviert durch den Administrator.
+CRXRANKS_HUDINFO_ENABLED = HUD Information &x06aktiviert.
+CRXRANKS_HUDINFO_DISABLED = HUD Information &x07deaktiviert.
 
 [nl] -- NapoleoN#
 CRXRANKS_RANKINFO_NORMAL = Je hebt %i/%i XP. Uw rang is #%i: %s. Volgend rang: %s.
