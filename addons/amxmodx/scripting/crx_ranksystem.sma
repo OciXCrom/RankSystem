@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.8"
+new const PLUGIN_VERSION[] = "3.8.1"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -208,6 +208,7 @@ new g_iObject[2]
 new g_fwdUserLevelUpdated
 new g_fwdUserReceiveXP
 new g_fwdUserXPUpdated
+new g_fwdUserNameChanged
 
 public plugin_init()
 {
@@ -217,6 +218,7 @@ public plugin_init()
 	register_dictionary(g_bIsCstrike ? "RankSystem.txt" : "RankSystemNoColors.txt")
 
 	register_event("DeathMsg", "OnPlayerKilled", "a")
+	register_message(get_user_msgid("SayText"), "OnSayText")
 
 	if(g_eSettings[SAVE_INTERVAL] == SAVE_ON_ROUND_END)
 	{
@@ -715,37 +717,45 @@ public client_disconnected(id)
 	remove_task(id + TASK_HUD)
 }
 
-public client_infochanged(id)
+public OnSayText(iMsg, iDestination, iEntity)
+{
+	new szArg[21]
+	get_msg_arg_string(2, szArg, charsmax(szArg))
+
+	static const szKey[] = "#Cstrike_Name_Change"
+
+	if(equal(szArg, szKey))
+	{
+		g_fwdUserNameChanged = register_forward(FM_ClientUserInfoChanged, "OnNameChange", 1)
+	}
+}
+
+public OnNameChange(id)
 {
 	if(!is_user_connected(id))
 	{
 		return
 	}
 
-	static const szKey[] = "name"
+	new szName[MAX_NAME_LENGTH]
+	get_user_name(id, szName, charsmax(szName))
 
-	new szNewName[MAX_NAME_LENGTH], szOldName[MAX_NAME_LENGTH]
-	get_user_info(id, szKey, szNewName, charsmax(szNewName))
-	get_user_name(id, szOldName, charsmax(szOldName))
-
-	if(!equal(szNewName, szOldName))
+	if(g_eSettings[SAVE_TYPE] == SAVE_NICKNAME)
 	{
-		if(g_eSettings[SAVE_TYPE] == SAVE_NICKNAME)
+		save_or_load(id, g_ePlayerData[id][SaveInfo], SL_SAVE_DATA)
+		copy(g_ePlayerData[id][SaveInfo], charsmax(g_ePlayerData[][SaveInfo]), szName)
+
+		if(g_eSettings[USE_MYSQL])
 		{
-			copy(g_ePlayerData[id][SaveInfo], charsmax(g_ePlayerData[][SaveInfo]), szNewName)
-			save_or_load(id, szOldName, SL_SAVE_DATA)
-
-			if(g_eSettings[USE_MYSQL])
-			{
-				reset_player_stats(id)
-			}
-
-			save_or_load(id, szNewName, SL_LOAD_DATA)
-			update_hudinfo(id)
+			reset_player_stats(id)
 		}
 
-		set_task(DELAY_ON_CHANGE, "update_vip_status", id)
+		save_or_load(id, szName, SL_LOAD_DATA)
+		update_hudinfo(id)
 	}
+
+	update_vip_status(id)
+	unregister_forward(FM_ClientUserInfoChanged, g_fwdUserNameChanged, 1)
 }
 
 public DisplayHUD(id)
@@ -1616,6 +1626,7 @@ public update_vip_status(id)
 	if(is_user_connected(id) && g_eSettings[VIP_FLAGS_BIT] != ADMIN_ALL)
 	{
 		g_ePlayerData[id][IsVIP] = bool:((get_user_flags(id) & g_eSettings[VIP_FLAGS_BIT]) == g_eSettings[VIP_FLAGS_BIT])
+		CromChat(id, "IsVIP = %s", g_ePlayerData[id][IsVIP] ? "&x05true" : "&x07false")
 	}
 }
 
