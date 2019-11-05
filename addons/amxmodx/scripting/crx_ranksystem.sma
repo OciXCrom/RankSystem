@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.8.1"
+new const PLUGIN_VERSION[] = "3.8.2"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -218,7 +218,7 @@ public plugin_init()
 	register_dictionary(g_bIsCstrike ? "RankSystem.txt" : "RankSystemNoColors.txt")
 
 	register_event("DeathMsg", "OnPlayerKilled", "a")
-	register_message(get_user_msgid("SayText"), "OnSayText")
+	register_event("SayText", "OnSayText", "a", "2=#Cstrike_Name_Change")
 
 	if(g_eSettings[SAVE_INTERVAL] == SAVE_ON_ROUND_END)
 	{
@@ -719,15 +719,7 @@ public client_disconnected(id)
 
 public OnSayText(iMsg, iDestination, iEntity)
 {
-	new szArg[21]
-	get_msg_arg_string(2, szArg, charsmax(szArg))
-
-	static const szKey[] = "#Cstrike_Name_Change"
-
-	if(equal(szArg, szKey))
-	{
-		g_fwdUserNameChanged = register_forward(FM_ClientUserInfoChanged, "OnNameChange", 1)
-	}
+	g_fwdUserNameChanged = register_forward(FM_ClientUserInfoChanged, "OnNameChange", 1)
 }
 
 public OnNameChange(id)
@@ -1626,7 +1618,6 @@ public update_vip_status(id)
 	if(is_user_connected(id) && g_eSettings[VIP_FLAGS_BIT] != ADMIN_ALL)
 	{
 		g_ePlayerData[id][IsVIP] = bool:((get_user_flags(id) & g_eSettings[VIP_FLAGS_BIT]) == g_eSettings[VIP_FLAGS_BIT])
-		CromChat(id, "IsVIP = %s", g_ePlayerData[id][IsVIP] ? "&x05true" : "&x07false")
 	}
 }
 
