@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.8.2"
+new const PLUGIN_VERSION[] = "3.9"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -118,6 +118,14 @@ enum _:SaveMethods
 	SAVE_MYSQL
 }
 
+enum _:HUDInfoVisibility
+{
+	VIS_ALL_PLAYERS,
+	VIS_ONLY_ALIVE,
+	VIS_ONLY_DEAD,
+	VIS_DEAD_FREEZE_TIME
+}
+
 enum _:Sections
 {
 	SECTION_NONE,
@@ -169,7 +177,7 @@ enum _:Settings
 	bool:USE_COMBINED_EVENTS,
 	bool:NOTIFY_ON_KILL,
 	bool:HUDINFO_ENABLED,
-	bool:HUDINFO_ALIVE_ONLY,
+	HUDINFO_VISIBILITY,
 	bool:HUDINFO_TEAM_LOCK,
 	bool:HUDINFO_OTHER_PLAYERS,
 	HUDINFO_COLOR[3],
@@ -198,6 +206,7 @@ new Trie:g_tSettings
 new Trie:g_tXPRewards
 new Trie:g_tXPRewardsVIP
 new bool:g_bIsCstrike
+new bool:g_bFreezeTime
 
 new g_iVault
 new g_iMaxLevels
@@ -219,6 +228,12 @@ public plugin_init()
 
 	register_event("DeathMsg", "OnPlayerKilled", "a")
 	register_event("SayText", "OnSayText", "a", "2=#Cstrike_Name_Change")
+
+	if(g_eSettings[HUDINFO_VISIBILITY] == VIS_DEAD_FREEZE_TIME)
+	{
+		register_event("HLTV", "OnFreezeTimeStart", "a", "1=0", "2=0")
+		register_logevent("OnRoundStart", 2, "1=Round_Start")
+	}
 
 	if(g_eSettings[SAVE_INTERVAL] == SAVE_ON_ROUND_END)
 	{
@@ -305,6 +320,14 @@ public plugin_precache()
 	g_tXPRewardsVIP = TrieCreate()
 
 	ReadFile()
+}
+
+public plugin_cfg()
+{
+	if(g_eSettings[HUDINFO_VISIBILITY] == VIS_DEAD_FREEZE_TIME && get_cvar_num("mp_freezetime"))
+	{
+		g_bFreezeTime = true
+	}
 }
 
 public plugin_end()
@@ -542,9 +565,9 @@ ReadFile()
 							{
 								g_eSettings[HUDINFO_ENABLED] = _:clamp(str_to_num(szValue), false, true)
 							}
-							else if(equal(szKey, "HUDINFO_ALIVE_ONLY"))
+							else if(equal(szKey, "HUDINFO_VISIBILITY") || equal(szKey, "HUDINFO_ALIVE_ONLY") /* changed in v3.9 */ )
 							{
-								g_eSettings[HUDINFO_ALIVE_ONLY] = _:clamp(str_to_num(szValue), false, true)
+								g_eSettings[HUDINFO_VISIBILITY] = clamp(str_to_num(szValue), VIS_ALL_PLAYERS, VIS_DEAD_FREEZE_TIME)
 							}
 							else if(equal(szKey, "HUDINFO_TEAM_LOCK"))
 							{
@@ -764,9 +787,23 @@ public DisplayHUD(id)
 	bIsAlive = is_user_alive(id) != 0
 	iTarget = id
 
-	if(!bIsAlive)
+	if(bIsAlive)
 	{
-		if(g_eSettings[HUDINFO_ALIVE_ONLY])
+		switch(g_eSettings[HUDINFO_VISIBILITY])
+		{
+			case VIS_ONLY_DEAD: return
+			case VIS_DEAD_FREEZE_TIME:
+			{
+				if(!g_bFreezeTime)
+				{
+					return
+				}
+			}
+		}
+	}
+	else
+	{
+		if(g_eSettings[HUDINFO_VISIBILITY] == VIS_ONLY_ALIVE)
 		{
 			return
 		}
@@ -964,6 +1001,16 @@ public Cmd_ResetXP(id, iLevel, iCid)
 	}
 
 	return PLUGIN_HANDLED
+}
+
+public OnFreezeTimeStart()
+{
+	g_bFreezeTime = true
+}
+
+public OnRoundStart()
+{
+	g_bFreezeTime = false
 }
 
 public OnRoundEnd()
