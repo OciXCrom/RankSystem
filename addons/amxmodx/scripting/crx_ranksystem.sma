@@ -1352,6 +1352,8 @@ give_user_xp(const id, iXP, CRXRanks_XPSources:iSource = CRXRANKS_XPS_PLUGIN)
 			return 0
 		}
 	}
+	
+	update_vip_status(id)
 
 	new iReturn
 	ExecuteForward(g_fwdUserReceiveXP, iReturn, id, iXP, iSource)
