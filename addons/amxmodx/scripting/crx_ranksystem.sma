@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.9.1"
+new const PLUGIN_VERSION[] = "3.9.2"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
