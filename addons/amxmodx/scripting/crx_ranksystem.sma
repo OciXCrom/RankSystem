@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.9"
+new const PLUGIN_VERSION[] = "3.9.1"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -224,7 +224,7 @@ public plugin_init()
 	register_plugin("OciXCrom's Rank System", PLUGIN_VERSION, "OciXCrom")
 	register_cvar("CRXRankSystem", PLUGIN_VERSION, FCVAR_SERVER|FCVAR_SPONLY|FCVAR_UNLOGGED)
 
-	register_dictionary(g_bIsCstrike ? "RankSystem.txt" : "RankSystemNoColors.txt")
+	register_dictionary("RankSystem.txt")
 
 	register_event("DeathMsg", "OnPlayerKilled", "a")
 	register_event("SayText", "OnSayText", "a", "2=#Cstrike_Name_Change")
@@ -304,7 +304,7 @@ public plugin_precache()
 	new szModname[MAX_NAME_LENGTH]
 	get_modname(szModname, charsmax(szModname))
 
-	if(equal(szModname, "cstrike"))
+	if(equal(szModname, "cstrike") || equal(szModname, "czero"))
 	{
 		g_bIsCstrike = true
 	}
@@ -871,11 +871,11 @@ public Cmd_XP(id)
 {
 	if(g_ePlayerData[id][Level] == g_iMaxLevels)
 	{
-		send_chat_message(id, false, "%L", id, "CRXRANKS_RANKINFO_FINAL", g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+		CC_SendMessage(id, "%L", id, "CRXRANKS_RANKINFO_FINAL", g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
 	}
 	else
 	{
-		send_chat_message(id, false, "%L", id, "CRXRANKS_RANKINFO_NORMAL", g_ePlayerData[id][XP], g_ePlayerData[id][NextXP],\
+		CC_SendMessage(id, "%L", id, "CRXRANKS_RANKINFO_NORMAL", g_ePlayerData[id][XP], g_ePlayerData[id][NextXP],\
 		g_ePlayerData[id][Level], g_ePlayerData[id][Rank], g_ePlayerData[id][NextRank])
 	}
 
@@ -916,12 +916,12 @@ public Cmd_HudInfo(id, iLevel, iCid)
 
 	if(!g_eSettings[HUDINFO_ENABLED])
 	{
-		send_chat_message(id, false, "%L", id, "CRXRANKS_HUDINFO_UNAVAILABLE")
+		CC_SendMessage(id, "%L", id, "CRXRANKS_HUDINFO_UNAVAILABLE")
 		return PLUGIN_HANDLED
 	}
 
 	g_ePlayerData[id][HudInfoEnabled] = !g_ePlayerData[id][HudInfoEnabled]
-	send_chat_message(id, false, "%L", id, g_ePlayerData[id][HudInfoEnabled] ? "CRXRANKS_HUDINFO_ENABLED" : "CRXRANKS_HUDINFO_DISABLED")
+	CC_SendMessage(id, "%L", id, g_ePlayerData[id][HudInfoEnabled] ? "CRXRANKS_HUDINFO_ENABLED" : "CRXRANKS_HUDINFO_DISABLED")
 	return PLUGIN_HANDLED
 }
 
@@ -966,7 +966,7 @@ public Cmd_GiveXP(id, iLevel, iCid)
 		iXP *= -1
 	}
 
-	send_chat_message(0, true, "%L", id, szKey, szName[0], iXP, szName[1])
+	CC_LogMessage(0, _, "%L", id, szKey, szName[0], iXP, szName[1])
 	return PLUGIN_HANDLED
 }
 
@@ -993,7 +993,7 @@ public Cmd_ResetXP(id, iLevel, iCid)
 
 	g_ePlayerData[iPlayer][XP] = 0
 	check_level(iPlayer, true)
-	send_chat_message(0, true, "%L", id, "CRXRANKS_RESET_XP", szName[0], szName[1])
+	CC_LogMessage(0, _, "%L", id, "CRXRANKS_RESET_XP", szName[0], szName[1])
 
 	if(g_eSettings[SAVE_INTERVAL] == SAVE_ON_XP_CHANGE)
 	{
@@ -1096,7 +1096,7 @@ public OnPlayerKilled()
 
 		if(should_send_kill_message(iXP))
 		{
-			send_chat_message(iVictim, false, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
+			CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_SUICIDE_GET" : "CRXRANKS_NOTIFY_SUICIDE_LOSE", abs(iXP))
 		}
 
 		return
@@ -1160,14 +1160,14 @@ public OnPlayerKilled()
 	{
 		new szName[MAX_NAME_LENGTH]
 		get_user_name(iVictim, szName, charsmax(szName))
-		send_chat_message(iAttacker, false, "%L", iAttacker, iXP > 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
+		CC_SendMessage(iAttacker, "%L", iAttacker, iXP > 0 ? "CRXRANKS_NOTIFY_KILL_GET" : "CRXRANKS_NOTIFY_KILL_LOSE", abs(iXP), szName)
 	}
 
 	iXP = give_user_xp(iVictim, get_xp_reward(iVictim, XPREWARD_DEATH), CRXRANKS_XPS_REWARD)
 
 	if(should_send_kill_message(iXP))
 	{
-		send_chat_message(iVictim, false, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
+		CC_SendMessage(iVictim, "%L", iVictim, iXP > 0 ? "CRXRANKS_NOTIFY_DEATH_GET" : "CRXRANKS_NOTIFY_DEATH_LOSE", abs(iXP))
 	}
 }
 
@@ -1478,34 +1478,6 @@ bool:should_send_kill_message(const iXP)
 	return (g_eSettings[NOTIFY_ON_KILL] && iXP != 0)
 }
 
-send_chat_message(const id, const bool:bLog, const szInput[], any:...)
-{
-	new szMessage[192]
-	vformat(szMessage, charsmax(szMessage), szInput, 4)
-
-	if(g_bIsCstrike)
-	{
-		if(bLog)
-		{
-			CC_LogMessage(id, _, szMessage)
-		}
-		else
-		{
-			CC_SendMessage(id, szMessage)
-		}
-	}
-	else
-	{
-		format(szMessage, charsmax(szMessage), "%s %s", CC_PREFIX, szMessage)
-		client_print(id, print_chat, szMessage)
-
-		if(bLog)
-		{
-			log_amx(szMessage)
-		}
-	}
-}
-
 update_hudinfo(const id)
 {
 	if(!g_eSettings[HUDINFO_ENABLED])
@@ -1615,12 +1587,12 @@ check_level(const id, const bool:bNotify)
 				for(i = 0; i < iPnum; i++)
 				{
 					iPlayer = iPlayers[i]
-					send_chat_message(iPlayer, false, "%L", iPlayer, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+					CC_SendMessage(iPlayer, "%L", iPlayer, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
 				}
 			}
 			else
 			{
-				send_chat_message(id, false, "%L", id, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
+				CC_SendMessage(id, "%L", id, bLevelUp ? "CRXRANKS_LEVEL_REACHED" : "CRXRANKS_LEVEL_LOST", szName, g_ePlayerData[id][Level], g_ePlayerData[id][Rank])
 			}
 
 			if(bLevelUp && g_eSettings[LEVELUP_SOUND][0])
