@@ -23,7 +23,7 @@
 	#define replace_string replace_all
 #endif
 
-new const PLUGIN_VERSION[] = "3.9.2"
+new const PLUGIN_VERSION[] = "3.10"
 const Float:DELAY_ON_CONNECT = 5.0
 const Float:HUD_REFRESH_FREQ = 1.0
 const Float:DELAY_ON_CHANGE = 0.1
@@ -219,6 +219,16 @@ new g_fwdUserReceiveXP
 new g_fwdUserXPUpdated
 new g_fwdUserNameChanged
 
+// !!!
+public amxbans_admin_connect(id)
+{
+	if(g_ePlayerData[id][Level] == g_iMaxLevels && g_eSettings[FINAL_LEVEL_FLAGS])
+	{
+		set_user_flags(id, g_eSettings[FINAL_LEVEL_FLAGS_BIT])
+		remove_user_flags(id, g_iFlagZ)
+	}
+}
+
 public plugin_init()
 {
 	register_plugin("OciXCrom's Rank System", PLUGIN_VERSION, "OciXCrom")
@@ -270,27 +280,22 @@ public plugin_init()
 		if(iSqlConnection == Empty_Handle)
 		{
 			log_amx(g_szSqlError)
-			switch_to_nvault()
-			goto @FREE_SQL_CONNECTION
+			log_amx("%L", LANG_SERVER, "CRXRANKS_MYSQL_FAILED")
+			g_eSettings[USE_MYSQL] = false
+		}
+		else
+		{
+			SQL_FreeHandle(iSqlConnection)
 		}
 
-		new Handle:iQueries = SQL_PrepareQuery(iSqlConnection,\
-		"CREATE TABLE IF NOT EXISTS `%s` (`Player` VARCHAR(%i) NOT NULL, `XP` INT(%i) NOT NULL, `Level` INT(%i) NOT NULL,\
+		new szQuery[MAX_QUERY_LENGTH]
+
+		formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS `%s` (`Player` VARCHAR(%i) NOT NULL, `XP` INT(%i) NOT NULL, `Level` INT(%i) NOT NULL,\
 		`Next XP` INT(%i) NOT NULL, `Rank` VARCHAR(%i) NOT NULL, `Next Rank` VARCHAR(%i) NOT NULL, PRIMARY KEY(Player));",\
 		g_eSettings[SQL_TABLE], MAX_SQL_PLAYER_LENGTH, CRXRANKS_MAX_XP_LENGTH, CRXRANKS_MAX_XP_LENGTH, CRXRANKS_MAX_XP_LENGTH,\
 		MAX_SQL_RANK_LENGTH, MAX_SQL_RANK_LENGTH)
 
-		if(!SQL_Execute(iQueries))
-		{
-			SQL_QueryError(iQueries, g_szSqlError, charsmax(g_szSqlError))
-			log_amx(g_szSqlError)
-			switch_to_nvault()
-		}
-
-		SQL_FreeHandle(iQueries)
-
-		@FREE_SQL_CONNECTION:
-		SQL_FreeHandle(iSqlConnection)
+		SQL_ThreadQuery(g_iSqlTuple, "QueryHandler", szQuery)
 	}
 
 	if(!g_eSettings[USE_MYSQL])
@@ -1178,6 +1183,11 @@ public sort_players_by_xp(id1, id2)
 
 public QueryHandler(iFailState, Handle:iQuery, szError[], iErrorCode)
 {
+	check_and_log_query_error(iFailState, szError, iErrorCode)
+}
+
+check_and_log_query_error(iFailState, const szError[], iErrorCode)
+{
 	switch(iFailState)
 	{
 		case TQUERY_CONNECT_FAILED: log_amx("[SQL Error] Connection failed (%i): %s", iErrorCode, szError)
@@ -1216,16 +1226,14 @@ save_or_load(const id, const szInfo[], const iType)
 			if(g_eSettings[USE_MYSQL])
 			{
 				new szQuery[MAX_QUERY_LENGTH], szPlayer[MAX_SQL_PLAYER_LENGTH], szRank[MAX_SQL_RANK_LENGTH], szNextRank[MAX_SQL_RANK_LENGTH]
-				new iErrorCode, Handle:iSqlConnection = SQL_Connect(g_iSqlTuple, iErrorCode, g_szSqlError, charsmax(g_szSqlError))
 
-				SQL_QuoteString(iSqlConnection, szPlayer, charsmax(szPlayer), szInfo)
-				SQL_QuoteString(iSqlConnection, szRank, charsmax(szRank), g_ePlayerData[id][Rank])
-				SQL_QuoteString(iSqlConnection, szNextRank, charsmax(szNextRank), g_ePlayerData[id][NextRank])
+				SQL_QuoteString(Empty_Handle, szPlayer, charsmax(szPlayer), szInfo)
+				SQL_QuoteString(Empty_Handle, szRank, charsmax(szRank), g_ePlayerData[id][Rank])
+				SQL_QuoteString(Empty_Handle, szNextRank, charsmax(szNextRank), g_ePlayerData[id][NextRank])
 
-				formatex(szQuery, charsmax(szQuery), "UPDATE `%s` SET `XP`='%i',`Level`='%i',`Next XP`='%i',`Rank`='%s',`Next Rank`='%s' WHERE `Player`='%s';",\
-				g_eSettings[SQL_TABLE], g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][NextXP], szRank, szNextRank, szPlayer)
+				formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (`Player`, `XP`, `Level`, `Next XP`, `Rank`, `Next Rank`) VALUES ('%s', '%i', '%i', '%i', '%s', '%s');",\
+				g_eSettings[SQL_TABLE], szPlayer, g_ePlayerData[id][XP], g_ePlayerData[id][Level], g_ePlayerData[id][NextXP], szRank, szNextRank)
 				SQL_ThreadQuery(g_iSqlTuple, "QueryHandler", szQuery)
-				SQL_FreeHandle(iSqlConnection)
 			}
 			else
 			{
@@ -1238,63 +1246,14 @@ save_or_load(const id, const szInfo[], const iType)
 		{
 			if(g_eSettings[USE_MYSQL])
 			{
-				new szPlayer[MAX_SQL_PLAYER_LENGTH], iErrorCode, Handle:iSqlConnection = SQL_Connect(g_iSqlTuple, iErrorCode, g_szSqlError, charsmax(g_szSqlError))
-				SQL_QuoteString(iSqlConnection, szPlayer, charsmax(szPlayer), szInfo)
-
-				if(iSqlConnection == Empty_Handle)
-				{
-					log_amx(g_szSqlError)
-					goto @FREE_SQL_CONNECTION
-				}
-
-				new Handle:iQuery = SQL_PrepareQuery(iSqlConnection, "SELECT * FROM %s WHERE Player = '%s';", g_eSettings[SQL_TABLE], szPlayer)
-
-				if(!SQL_Execute(iQuery))
-				{
-					SQL_QueryError(iQuery, g_szSqlError, charsmax(g_szSqlError))
-					log_amx(g_szSqlError)
-					goto @FREE_QUERY
-				}
-
-				new bool:bNewPlayer = SQL_NumResults(iQuery) > 0 ? false : true
-				SQL_FreeHandle(iQuery)
+				new szPlayer[MAX_SQL_PLAYER_LENGTH]
+				SQL_QuoteString(Empty_Handle, szPlayer, charsmax(szPlayer), szInfo)
 
 				new szQuery[MAX_QUERY_LENGTH]
+				formatex(szQuery, charsmax(szQuery), "SELECT XP FROM `%s` WHERE Player = '%s';", g_eSettings[SQL_TABLE], szPlayer)
 
-				if(bNewPlayer)
-				{
-					formatex(szQuery, charsmax(szQuery), "INSERT INTO %s (`Player`,`XP`,`Level`,`Next XP`,`Rank`,`Next Rank`) VALUES ('%s','0','1','0','n/a','n/a');", g_eSettings[SQL_TABLE], szPlayer)
-				}
-				else
-				{
-					formatex(szQuery, charsmax(szQuery), "SELECT XP FROM %s WHERE Player = '%s';", g_eSettings[SQL_TABLE], szPlayer)
-				}
-
-				iQuery = SQL_PrepareQuery(iSqlConnection, szQuery)
-
-				if(!SQL_Execute(iQuery))
-				{
-					SQL_QueryError(iQuery, g_szSqlError, charsmax(g_szSqlError))
-					log_amx(g_szSqlError)
-					goto @CHECK_LEVEL
-				}
-
-				if(!bNewPlayer)
-				{
-					if(SQL_NumResults(iQuery) > 0)
-					{
-						g_ePlayerData[id][XP] = SQL_ReadResult(iQuery, 0)
-					}
-				}
-
-				@CHECK_LEVEL:
-				check_level(id, false)
-
-				@FREE_QUERY:
-				SQL_FreeHandle(iQuery)
-
-				@FREE_SQL_CONNECTION:
-				SQL_FreeHandle(iSqlConnection)
+				new iData[1]; iData[0] = id
+				SQL_ThreadQuery(g_iSqlTuple, "QueryLoadData", szQuery, iData, sizeof(iData))
 			}
 			else
 			{
@@ -1304,6 +1263,18 @@ save_or_load(const id, const szInfo[], const iType)
 			}
 		}
 	}
+}
+
+public QueryLoadData(iFailState, Handle:iQuery, szError[], iErrorCode, iData[], iSize)
+{
+	new id = iData[0]
+
+	if(SQL_NumResults(iQuery))
+	{
+		g_ePlayerData[id][XP] = SQL_ReadResult(iQuery, 0)
+	}
+	
+	check_level(id, false)
 }
 
 get_xp_reward(const id, const szKey[])
@@ -1451,16 +1422,6 @@ reset_player_stats(const id)
 	g_ePlayerData[id][IsOnFinalLevel] = false
 	g_ePlayerData[id][IsVIP] = false
 	g_ePlayerData[id][IsBot] = false
-}
-
-switch_to_nvault()
-{
-	if(g_eSettings[USE_MYSQL])
-	{
-		g_eSettings[USE_MYSQL] = false
-		log_amx("%L", LANG_SERVER, "CRXRANKS_MYSQL_FAILED")
-		SQL_FreeHandle(g_iSqlTuple)
-	}
 }
 
 bool:has_argument(const szMessage[], const szArg[])
