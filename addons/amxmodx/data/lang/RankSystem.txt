@@ -198,18 +198,28 @@ CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
 CRXRANKS_XP_NOTIFIER_GET = +%i XP
 CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
 
-[ru] -- Dev-CS Team
-CRXRANKS_RANKINFO_NORMAL = У вас &x04%i/%i опыта&x01. Ваше звание &x04#%i&x01: &x03%s&x01. Следующее звание: &x03%s&x01.
-CRXRANKS_RANKINFO_FINAL = У вас &x04%i опыта&x01. Ваше звание &x04#%i&x01: &x03%s&x01. Вы достигли последнего звания!
-CRXRANKS_GIVE_XP = &x03%s &x01дал &x04%i опыта &x01игроку &x03%s
-CRXRANKS_TAKE_XP = &x03%s &x01взял &x04%i опыта &x01у игрока &x03%s
-CRXRANKS_RESET_XP = &x03%s &x01обнулил &x03%s&x01's опыт
-CRXRANKS_LEVEL_REACHED = &x03%s &x01достиг &x04Уровень %i &x01[&x03%s&x01]
-CRXRANKS_LEVEL_LOST = &x03%s &x01откатился назад на &x04Уровень %i &x01[&x03%s&x01]
+[ru] -- Dev-CS Team / DrHesperus
+CRXRANKS_RANKINFO_NORMAL = У Вас &x04%i/%i XP&x01. Ваше звание &x04#%i&x01: &x03%s&x01. Следующее звание: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = У Вас &x04%i XP&x01. Ваше звание &x04#%i&x01: &x03%s&x01. Вы на финальном уровне!
+CRXRANKS_GIVE_XP = &x03%s &x01дал &x04%i XP &x01: &x03%s
+CRXRANKS_TAKE_XP = &x03%s &x01снял &x04%i XP &x01от &x03%s
+CRXRANKS_RESET_XP = &x03%s &x01сбросил XP &x03%s&x01
+CRXRANKS_LEVEL_REACHED = &x03%s &x01достиг &x04Уровня %i &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01вернулся на &x04Уровень %i &x01[&x03%s&x01]
 CRXRANKS_MENU_TITLE = \rOciXCrom's \yСистема званий: \rСписок опыта
-CRXRANKS_ITEM_FORMAT = \d[%i опыт] \w%s \r[\yУровень %i: %s\r]
-CRXRANKS_XP_NOTIFIER_GET = +%i опыта
-CRXRANKS_XP_NOTIFIER_LOSE = -%i опыта
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yУровень %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Вы получили &x04%i XP &x01за убийство &x03%s
+CRXRANKS_NOTIFY_KILL_LOSE = Вы потеряли &x04%i XP &x01за убийство &x03%s
+CRXRANKS_NOTIFY_SUICIDE_GET = Вы получили &x04%i XP &x01за &x03совершение самоубийства&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Вы потеряли &x04%i XP &x01за &x03совершение самоубийства&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Вы получили &x04%i XP &x01за умирание.
+CRXRANKS_NOTIFY_DEATH_LOSE = Вы потеряли &x04%i XP &x01за умирание.
+CRXRANKS_MYSQL_FAILED = Не удалось соединиться с MySQL. Плагин вместо этого будет использовать nVault.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD информация &x07отключена &x01: &x04Админом&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD информация &x06включена&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD информация &x07отключена&x01.
 
 [lt] -- Adomaz1
 CRXRANKS_RANKINFO_NORMAL = Turite &x04%i/%i patirties taškų&x01. Jūsų rangas: &x04#%i&x01: &x03%s&x01. Kitas rangas: &x03%s&x01.
