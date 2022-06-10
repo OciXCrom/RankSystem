@@ -253,3 +253,26 @@ CRXRANKS_NOTIFY_KILL_GET = Vous recevez &x04%i XP &x01en tuant &x03%s
 CRXRANKS_NOTIFY_KILL_LOSE = Vous perdez &x04%i XP &x01en tuant &x03%s
 CRXRANKS_NOTIFY_SUICIDE_LOSE = Vous perdez &x04%i XP &x01en vous &x03suicidant&x01.
 CRXRANKS_MYSQL_FAILED = Echec de la connexion MySQL. Le plugin utilisera nVault en remplacement.
+
+[ge] -- per4shK
+CRXRANKS_RANKINFO_NORMAL = Shen gaqvs &x04%i/%i XP&x01. Sheni wodeba aris &x04#%i&x01: &x03%s&x01. Shemdegi wodeba: &x03%s&x01.
+CRXRANKS_RANKINFO_FINAL = Shen gaqvs &x04%i XP&x01. Sheni wodeba aris &x04#%i&x01: &x03%s&x01. Shen gaqvs bolo wodeba!
+CRXRANKS_GIVE_XP = &x03%s &x01misca &x03%s&x01's &x04%i XP.
+CRXRANKS_TAKE_XP = &x03%s &x01waartva &x04%i XP &x03%s&x01'gan.
+CRXRANKS_RESET_XP = &x03%s &x01gadatvirta &x03%s&x01's XP.
+CRXRANKS_LEVEL_REACHED = &x03%s &x01miagwia &x04Level %i&x01'ze &x01[&x03%s&x01]
+CRXRANKS_LEVEL_LOST = &x03%s &x01dabrunda &x04Level %i&x01'ze &x01[&x03%s&x01]
+CRXRANKS_MENU_TITLE = \rOciXCrom'is \yWodebis Sistema: \rXP Listi
+CRXRANKS_ITEM_FORMAT = \d[%i XP] \w%s \r[\yLevel %i: %s\r]
+CRXRANKS_XP_NOTIFIER_GET = +%i XP
+CRXRANKS_XP_NOTIFIER_LOSE = -%i XP
+CRXRANKS_NOTIFY_KILL_GET = Shen miige &x04%i XP &x01motamashe &x03%s&x01's &x01mokvlistvis.
+CRXRANKS_NOTIFY_KILL_LOSE = Shen waage &x04%i XP &x01motamashe &x03%s&x01's &x01mokvlistvis.
+CRXRANKS_NOTIFY_SUICIDE_GET = Shen miige &x04%i XP &x01shentavis &x03mokvlistvis&x01.
+CRXRANKS_NOTIFY_SUICIDE_LOSE = Shen waage &x04%i XP &x01shentavis &x03mokvlistvis&x01.
+CRXRANKS_NOTIFY_DEATH_GET = Shen miige &x04%i XP &x01sikvdilistvis.
+CRXRANKS_NOTIFY_DEATH_LOSE = Shen waage &x04%i XP &x01sikvdilistvis.
+CRXRANKS_MYSQL_FAILED = MySQL ver chairto. Plagini gamoiyenebs nVault's mis nacvlad.
+CRXRANKS_HUDINFO_UNAVAILABLE = HUD informacia &x07gaitisha &x04mier Adminisgan&x01.
+CRXRANKS_HUDINFO_ENABLED = HUD informacia &x06Chairto&x01.
+CRXRANKS_HUDINFO_DISABLED = HUD informacia &x07Gaitisha&x01.
